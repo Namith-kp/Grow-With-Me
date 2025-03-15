@@ -11,7 +11,7 @@ export const Hero = () => {
           Connect with Your Perfect Co-Founder
         </h1>
         <p className="text-xl md:text-2xl text-gray-600 mb-20 max-w-3xl mx-auto">
-          Whether you're a founder with a vision or a developer looking for an exciting opportunity,
+          Whether you're a founder with a vision, a developer looking for an exciting opportunity, or an investor seeking the next big idea,
           find your ideal match and build something amazing together.
         </p>
         <div className="flex flex-col sm:flex-row gap-8 justify-center items-center mt-16">
@@ -22,7 +22,8 @@ export const Hero = () => {
             transform transition-all duration-300 ease-in-out
             hover:scale-105 hover:shadow-xl
             active:scale-95 active:shadow-md
-            backdrop-blur-sm"            onClick={() => navigate('/auth/recruiter')}
+            backdrop-blur-sm" 
+            onClick={() => navigate('/auth/recruiter')}
           >
             I'm a Founder
           </Button>
@@ -38,9 +39,21 @@ export const Hero = () => {
           >
             I'm a Developer
           </Button>
+          <Button 
+            size="lg"
+            className="w-full sm:w-auto text-xl px-12 py-8 rounded-xl text-white shadow-lg 
+            bg-gradient-to-r from-primary to-blue-400 hover:from-primary/90 hover:to-blue-500
+            transform transition-all duration-300 ease-in-out
+            hover:scale-105 hover:shadow-xl
+            active:scale-95 active:shadow-md
+            backdrop-blur-sm"
+            onClick={() => navigate('/auth/investor')}
+          >
+            I'm an Investor
+          </Button>
         </div>
         <div className="mt-32 text-sm text-gray-500">
-          Join our community of founders and developers building the next generation of startups
+          Join our community of founders, developers, and investors building the next generation of startups.
         </div>
       </div>
     </div>

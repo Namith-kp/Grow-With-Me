@@ -314,7 +314,7 @@ export const RecruiterDashboard = () => {
     try {
       const db = getFirestore();
       const profileRef = doc(db, 'recruiters', location.state.uid);
-      await updateDoc(profileRef, { ...editedProfile } as { [key: string]: any });
+      await updateDoc(profileRef, editedProfile);
       
       setProfile(editedProfile);
       setIsEditing(false);
@@ -659,7 +659,7 @@ export const RecruiterDashboard = () => {
                             <h3 className="text-xl font-semibold text-gray-900">{application.name}</h3>
                             <p className="text-gray-600">Experience: {application.experience}</p>
                             <div className="flex flex-wrap gap-2">
-                              {application.investmentInterests.split(',').map((tech, index) => (
+                              {application.skills.map((tech, index) => (
                                 <span
                                   key={index}
                                   className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium"

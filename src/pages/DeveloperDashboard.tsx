@@ -115,7 +115,33 @@ const DeveloperDashboard = () => {
         console.log('Starting to fetch ideas...'); // Debug log
         const ideasData = await getActiveJobs();
         console.log('Received ideas data:', ideasData); // Debug log
-        setIdeas(ideasData);
+
+        const mappedIdeas = ideasData.map((idea: any) => ({
+          ...idea,
+          recruiterId: idea.recruiterId || '',
+          uid: idea.uid || '',
+          cofounderRole: idea.cofounderRole || '',
+          companyName: idea.companyName || '',
+          companySize: idea.companySize || '',
+          companyWebsite: idea.companyWebsite || '',
+          email: idea.email || '',
+          equityRange: idea.equityRange || '',
+          experienceRequired: idea.experienceRequired || '',
+          fundingStage: idea.fundingStage || '',
+          ideaDescription: idea.ideaDescription || '',
+          idealCandidate: idea.idealCandidate || '',
+          photoURL: idea.photoURL || '',
+          responsibilities: idea.responsibilities || '',
+          roleDescription: idea.roleDescription || '',
+          salaryRange: idea.salaryRange || '',
+          status: idea.status || '',
+          techStack: idea.techStack || '',
+          createdAt: idea.createdAt,
+          updatedAt: idea.updatedAt,
+          id: idea.id,
+        }));
+  
+        setIdeas(mappedIdeas);
       } catch (error) {
         console.error('Error fetching ideas:', error);
         toast({
@@ -166,7 +192,7 @@ const DeveloperDashboard = () => {
     try {
       const db = getFirestore();
       const profileRef = doc(db, 'developers', location.state.uid);
-      await updateDoc(profileRef, editedProfile);
+      await updateDoc(profileRef,  { ...editedProfile });
       
       setProfile(editedProfile);
       setIsEditing(false);
@@ -203,7 +229,9 @@ const DeveloperDashboard = () => {
         ideaId,
         coverLetter: applicationData.coverLetter,
         resume: applicationData.resume,
-        whatsappNumber: applicationData.whatsappNumber
+        whatsappNumber: applicationData.whatsappNumber,
+        developerId: location.state.uid,
+        recruiterId: selectedIdea?.recruiterId || '',
       });
 
       if (result.success) {

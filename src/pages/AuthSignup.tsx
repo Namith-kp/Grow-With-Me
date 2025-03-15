@@ -9,7 +9,7 @@ import { Github, Mail, Loader2 } from 'lucide-react'
 import { useToast } from "@/components/ui/use-toast"
 
 type AuthSignupProps = {
-  userType: 'developer' | 'recruiter'
+  userType: 'developer' | 'recruiter' | 'investor'
 }
 
 export function AuthSignup({ userType }: AuthSignupProps) {
@@ -143,7 +143,7 @@ export function AuthSignup({ userType }: AuthSignupProps) {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Sign Up as {userType === 'developer' ? 'Developer' : 'Recruiter'}</CardTitle>
+          <CardTitle className="text-2xl">Sign Up as {userType === 'developer' ? 'Developer' : userType === 'recruiter' ? 'Recruiter' : 'Investor'}</CardTitle>
           <CardDescription>Choose your preferred sign-up method</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
