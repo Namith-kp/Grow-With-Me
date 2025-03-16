@@ -58,6 +58,7 @@ interface InvestorApplication {
   appliedDate: string;
   status: string;
   coverLetter: string;
+
   whatsappNumber: string;
 }
 
@@ -657,9 +658,9 @@ export const RecruiterDashboard = () => {
                         <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                           <div className="space-y-3">
                             <h3 className="text-xl font-semibold text-gray-900">{application.name}</h3>
-                            <p className="text-gray-600">Experience: {application.experience}</p>
+                            <p className="text-gray-600">Net Worth: {application.experience}</p>
                             <div className="flex flex-wrap gap-2">
-                              {application.skills.map((tech, index) => (
+                              {application.investmentInterests.map((tech, index) => (
                                 <span
                                   key={index}
                                   className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium"

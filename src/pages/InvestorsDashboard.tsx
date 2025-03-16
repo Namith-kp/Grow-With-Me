@@ -21,6 +21,7 @@ interface InvestorProfile {
   portfolioValue: number;
   investmentHistory: string[];
   investmentInterests: string;
+  photoURL: string;
   netWorth: string;
   pastInvestments: string;
 }

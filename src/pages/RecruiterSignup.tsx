@@ -184,7 +184,7 @@ export const RecruiterSignup = () => {
             Find Your Next Tech Co-founder
           </h1>
           <p className="text-xl text-gray-600 leading-relaxed">
-            Connect with talented developers who can bring your vision to life. FounderBridge helps you find the perfect technical match for your startup.
+            Connect with talented developers who can bring your vision to life. Grow With Me helps you find the perfect technical match for your startup.
           </p>
           <div className="space-y-4 py-6">
             <div className="flex items-center gap-3">

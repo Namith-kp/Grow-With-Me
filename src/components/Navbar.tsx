@@ -42,7 +42,7 @@ export const Navbar = () => {
             to="/" 
             className="text-2xl font-extrabold text-primary tracking-tight hover:opacity-80 transition-opacity"
           >
-            FounderBridge
+            Grow With Me
           </Link>
           <div className="flex gap-4 items-center">
             {showSignOut ? (

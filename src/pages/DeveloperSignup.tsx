@@ -184,7 +184,7 @@ export const DeveloperSignup = () => {
           className="space-y-6 lg:pr-8"
         >
           <h1 className="text-4xl font-bold leading-tight lg:text-5xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-            Welcome to FounderBridge
+            Welcome to Grow With Me
           </h1>
           <p className="text-xl text-gray-600 leading-relaxed">
             Join our community of talented developers and find your perfect startup match. We connect passionate engineers with innovative founders.

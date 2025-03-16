@@ -58,6 +58,7 @@ interface InvestorApplication {
   appliedDate: string;
   status: string;
   coverLetter: string;
+  photoURL: string;
   whatsappNumber: string;
 }
 
@@ -102,6 +103,7 @@ export const RecruiterDashboard = () => {
   const [investorApplications, setInvestorApplications] = useState<InvestorApplication[]>([]);
   const [showInvestorApplicationDetails, setShowInvestorApplicationDetails] = useState(false);
   const [selectedInvestorApplication, setSelectedInvestorApplication] = useState<InvestorApplication | null>(null);
+  const [activeApplicationTab, setActiveApplicationTab] = useState<'developers' | 'investors'>('developers');
 
 
   const handleViewCandidate = (candidate: Candidate) => {
@@ -284,6 +286,7 @@ export const RecruiterDashboard = () => {
               appliedDate: appData.createdAt?.toDate().toISOString().split('T')[0] || '',
               status: appData.status,
               coverLetter: appData.coverLetter,
+              photoURL: investorData.photoURL || '',
               whatsappNumber: appData.whatsappNumber || ''
             };
           })
@@ -507,9 +510,29 @@ export const RecruiterDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Applications Section */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex gap-4">
+                <Button
+                  variant={activeApplicationTab === 'developers' ? "default" : "outline"}
+                  onClick={() => setActiveApplicationTab('developers')}
+                >
+                  Developer Applications
+                </Button>
+                <Button
+                  variant={activeApplicationTab === 'investors' ? "default" : "outline"}
+                  onClick={() => setActiveApplicationTab('investors')}
+                >
+                  Investor Applications
+                </Button>
+              </div>
+            </div>
             
             {/* Developer Applications Section */}
-            <div className="lg:col-span-2 space-y-6">
+            {/* <div className="lg:col-span-2 space-y-6"> */}
+            {activeApplicationTab === 'developers' && (
                 <Card className="border-none shadow-xl bg-white">
                 <CardHeader className="border-b border-gray-100">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -611,8 +634,10 @@ export const RecruiterDashboard = () => {
                   </div>
                 </CardContent>
                 </Card>
+                )}
 
                 {/* Investor Applications Section */}
+                {activeApplicationTab === 'investors' && (
                 <Card className="border-none shadow-xl bg-white">
                 <CardHeader className="border-b border-gray-100">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -657,7 +682,7 @@ export const RecruiterDashboard = () => {
                         <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                           <div className="space-y-3">
                             <h3 className="text-xl font-semibold text-gray-900">{application.name}</h3>
-                            <p className="text-gray-600">Experience: {application.experience}</p>
+                            <p className="text-gray-600">Net Worth: {application.netWorth}</p>
                             <div className="flex flex-wrap gap-2">
                               {application.investmentInterests.split(',').map((tech, index) => (
                                 <span
@@ -714,8 +739,8 @@ export const RecruiterDashboard = () => {
                   </div>
                 </CardContent>
                 </Card>
+                )}
             </div>
-            
           </div>
         </div>
       </motion.div>
@@ -1116,7 +1141,102 @@ export const RecruiterDashboard = () => {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+      <Dialog open={showInvestorApplicationDetails} onOpenChange={setShowInvestorApplicationDetails}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Investor Details</DialogTitle>
+          </DialogHeader>
+          {selectedInvestorApplication && (
+            <div className="space-y-6">
+              <div className="flex items-center space-x-4">
+                {selectedInvestorApplication.photoURL && (
+                  <img
+                    src={selectedInvestorApplication.photoURL}
+                    alt={selectedInvestorApplication.name}
+                    className="w-16 h-16 rounded-full"
+                  />
+                )}
+                <div>
+                  <h3 className="text-xl font-semibold">{selectedInvestorApplication.name}</h3>
+                  <p className="text-gray-500">{selectedInvestorApplication.email}</p>
+                  {selectedInvestorApplication.whatsappNumber && (
+                    <p className="text-gray-500 flex items-center space-x-2">
+                      <FaWhatsapp className="text-green-500 text-lg" />
+                      <a 
+                        href={`https://wa.me/${selectedInvestorApplication.whatsappNumber.replace(/\+/g, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline flex items-center"
+                      >
+                        {selectedInvestorApplication.whatsappNumber}
+                      </a>
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h4 className="font-semibold mb-2">Net Worth</h4>
+                  <p>{selectedInvestorApplication.netWorth}</p>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">Investment Interests</h4>
+                <div className="flex flex-wrap gap-2">
+                  {selectedInvestorApplication.investmentInterests.split(',').map((tech, index) => (
+                    <span
+                      key={index}
+                      className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">Past Investments</h4>
+                <p className="whitespace-pre-wrap">{selectedInvestorApplication.pastInvestments}</p>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">Cover Letter</h4>
+                <p className="whitespace-pre-wrap">{selectedInvestorApplication.coverLetter}</p>
+              </div>
+
+              
+
+              {selectedInvestorApplication.status === 'pending' && (
+                <div className="flex justify-end space-x-4">
+                  <Button
+                    variant="default"
+                    onClick={() => {
+                      handleUpdateInvestorApplicationStatus(selectedInvestorApplication.id, 'accepted');
+                      setShowInvestorApplicationDetails(false);
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    Accept Application
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      handleUpdateInvestorApplicationStatus(selectedInvestorApplication.id, 'rejected');
+                      setShowInvestorApplicationDetails(false);
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    Reject Application
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>    
   );
 };
 

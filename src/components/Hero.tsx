@@ -52,7 +52,7 @@ export const Hero = () => {
             I'm an Investor
           </Button>
         </div>
-        <div className="mt-32 text-sm text-gray-500">
+        <div className="mt-24 text-sm text-gray-500">
           Join our community of founders, developers, and investors building the next generation of startups.
         </div>
       </div>
