@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-export default {
+const config: Config = {
   darkMode: ["class"],
   content: [
     "./pages/**/*.{ts,tsx}",
@@ -19,6 +19,7 @@ export default {
     },
     extend: {
       colors: {
+        customBackground: '#1a202c',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -36,6 +37,20 @@ export default {
           DEFAULT: "#38BDF8",
           foreground: "#ffffff",
         },
+        light: {
+          background: '#ffffff',
+          foreground: '#1a202c',
+          primary: '#0f172a',
+          secondary: '#2563eb',
+          accent: '#fbbf24',
+        },
+        dark: {
+          background: '#0f172a',
+          foreground: '#f8fafc',
+          primary: '#94a3b8',
+          secondary: '#4f46e5',
+          accent: '#f97316',
+        },
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
@@ -45,20 +60,7 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-      },
-      keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
-        },
-        float: {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-5px)" },
-        },
+       
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -68,4 +70,6 @@ export default {
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config;
+};
+
+export default config;

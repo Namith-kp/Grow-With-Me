@@ -390,7 +390,7 @@ export const RecruiterDashboard = () => {
   if (loading || !profile) {
     return (
       <>
-        <Navbar />
+        {/* <Navbar /> */}
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="animate-pulse space-y-4">
@@ -409,11 +409,11 @@ export const RecruiterDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Navbar />
+      {/* <Navbar /> */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="min-h-screen bg-gradient-to-b from-gray-50 to-white"
+        className="min-h-screen bg-white dark:bg-gray-900 text-black dark:text-white"
       >
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -699,7 +699,7 @@ export const RecruiterDashboard = () => {
                             <div className="flex gap-2">
                               <Button 
                                 variant="outline" 
-                                className="hover:bg-primary hover:text-white transition-colors"
+                                // className="hover:bg-primary hover:text-white transition-colors"
                                 onClick={() => handleViewInvestorApplication(application)}
                               >
                                 View Profile
@@ -714,7 +714,7 @@ export const RecruiterDashboard = () => {
                                     Accept
                                   </Button>
                                   <Button
-                                    variant="destructive"
+                                    variant="outline"
                                     onClick={() => handleUpdateInvestorApplicationStatus(application.id, 'rejected')}
                                     disabled={isSubmitting}
                                   >
@@ -1126,7 +1126,7 @@ export const RecruiterDashboard = () => {
                     Accept Application
                   </Button>
                   <Button
-                    variant="destructive"
+                    variant="outline"
                     onClick={() => {
                       handleUpdateApplicationStatus(selectedCandidate.id, 'rejected');
                       setShowCandidateDetails(false);
@@ -1211,7 +1211,7 @@ export const RecruiterDashboard = () => {
               {selectedInvestorApplication.status === 'pending' && (
                 <div className="flex justify-end space-x-4">
                   <Button
-                    variant="default"
+                    variant="outline"
                     onClick={() => {
                       handleUpdateInvestorApplicationStatus(selectedInvestorApplication.id, 'accepted');
                       setShowInvestorApplicationDetails(false);
@@ -1221,7 +1221,7 @@ export const RecruiterDashboard = () => {
                     Accept Application
                   </Button>
                   <Button
-                    variant="destructive"
+                    variant="outline"
                     onClick={() => {
                       handleUpdateInvestorApplicationStatus(selectedInvestorApplication.id, 'rejected');
                       setShowInvestorApplicationDetails(false);

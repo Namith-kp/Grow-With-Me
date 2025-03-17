@@ -13,8 +13,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { getActiveJobs, submitApplication } from "@/lib/user";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
 
-interface DeveloperProfile {
+interface DeveloperProfile {                                                      
   firstName: string;
   lastName: string;
   email: string;
@@ -158,7 +159,7 @@ const DeveloperDashboard = () => {
   if (loading || !profile) {
     return (
       <>
-        <Navbar />
+        {/* <Navbar /> */}
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="animate-pulse space-y-4">
@@ -172,6 +173,14 @@ const DeveloperDashboard = () => {
     );
   }
 
+  
+  // return (
+  //   <div className="min-h-screen bg-background text-foreground p-4">
+  //     <h1 className="text-2xl font-bold">Dashboard</h1>
+  //       <ThemeSwitcher />
+  //   </div>
+  // );
+  
   const toggleSaveIdea = (ideaId: string) => {
     setSavedIdeas(prev => 
       prev.includes(ideaId) 
@@ -262,11 +271,11 @@ const DeveloperDashboard = () => {
 
   return (
     <>
-    <Navbar/>    
+    {/* <Navbar/>     */}
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen bg-gradient-to-b from-gray-50 to-white"
+      className="min-h-screen bg-white dark:bg-gray-900 text-black dark:text-white"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header Section */}

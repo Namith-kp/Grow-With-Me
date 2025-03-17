@@ -49,6 +49,8 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    
   }
 
   .dark {
@@ -92,10 +94,12 @@
 
 @layer base {
   * {
-    @apply border-border;
+    /* ✅ Fix applied here */
+    border-color: hsl(var(--border));
   }
 
   body {
+    /* background-color: hsl(var(--background)); */
     @apply bg-background text-foreground;
   }
 }

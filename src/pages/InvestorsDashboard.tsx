@@ -178,7 +178,7 @@ const InvestorDashboard = () => {
   if (loading || !profile) {
     return (
       <>
-        <Navbar />
+        {/* <Navbar /> */}
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="animate-pulse space-y-4">
@@ -282,15 +282,15 @@ const InvestorDashboard = () => {
 
   return (
     <>
-      <Navbar />
+      {/* <Navbar /> */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="min-h-screen bg-gradient-to-b from-gray-50 to-white"
+        className="min-h-screen bg-white dark:bg-gradient-to-b dark:from-[#0f0c29] dark:via-[#6b29e4] dark:to-[#24243e] text-black dark:text-white"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-red-300 dark:to-blue-500">
               Investor Dashboard
             </h1>
           </div>
@@ -304,9 +304,9 @@ const InvestorDashboard = () => {
                          Investor Profile
                         </h2>
                         <Button
-                            variant="ghost"
+                            variant="outline"
                             size="icon"
-                            className="hover:bg-primary"
+                            // className="hover:bg-primary"
                             onClick={() => {
                             setEditedProfile(profile);
                             setIsEditing(true);
@@ -408,10 +408,10 @@ const InvestorDashboard = () => {
                                 <p className="text-gray-600 mt-1">{idea.companyName}</p>
                               </div>
                               <Button
-                                variant="ghost"
+                                variant="outline"
                                 size="icon"
                                 onClick={() => toggleSaveIdea(idea.id)}
-                                className="hover:bg-primary/10"
+                                // className="hover:bg-primary/10"
                               >
                                 {savedIdeas.includes(idea.id) ? (
                                   <BsBookmarkFill className="h-5 w-5 text-primary" />

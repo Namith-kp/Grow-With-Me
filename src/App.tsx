@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import React, { useState, useEffect } from 'react';
+import { Navbar } from './components/Navbar';
 
 // Pages
 import Index from "./pages/Index"
@@ -15,10 +17,27 @@ import InvestorsDashboard from './pages/InvestorsDashboard'
 const queryClient = new QueryClient()
 
 function App() {
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    // Apply the theme class to the HTML element
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="min-h-screen">
+        <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
+          <Navbar theme={theme} toggleTheme={toggleTheme} />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth/developer" element={<AuthSignup userType="developer" />} />
