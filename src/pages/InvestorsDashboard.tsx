@@ -297,10 +297,10 @@ const InvestorDashboard = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Profile Section */}
-            <Card className="lg:col-span-1 border-none shadow-xl bg-white">
+            <Card className="lg:col-span-1 border-none shadow-xl bg-white dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800">
               <CardHeader className="border-b border-gray-100">
                     <div className="flex justify-between items-center">
-                        <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                        <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-green-500 dark:to-blue-500">
                          Investor Profile
                         </h2>
                         <Button
