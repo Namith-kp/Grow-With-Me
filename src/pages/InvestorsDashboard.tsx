@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { BsCurrencyDollar } from "react-icons/bs";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
-import { BsPencil, BsBookmark, BsBookmarkFill } from "react-icons/bs";
+import { BsPencil, BsBookmark, BsBookmarkFill,BsPerson } from "react-icons/bs";
 import { useLocation } from "react-router-dom";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { useToast } from "@/components/ui/use-toast";
@@ -74,6 +74,8 @@ const InvestorDashboard = () => {
   const [portfolioPerformance, setPortfolioPerformance] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
     const [applicationData, setApplicationData] = useState({
         coverLetter: "",
         whatsappNumber: ""
@@ -235,7 +237,7 @@ const InvestorDashboard = () => {
     return investmentInterests.split(',').map((tech, index) => (
       <span
         key={index}
-        className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium"
+        className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-primary/70 dark:text-gray-200"
       >
         {tech.trim()}
       </span>
@@ -293,79 +295,27 @@ const InvestorDashboard = () => {
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-red-300 dark:to-blue-500">
               Investor Dashboard
             </h1>
+            <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsProfileOpen(true)}
+            className="border flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
+          >
+            {/* <BsPerson className="h-6 w-6" /> */}
+            <img src={profile.photoURL} alt="Profile" className="h-6 w-6 rounded-full" />
+            <span><h3>Profile</h3></span>
+          </Button>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Profile Section */}
-            <Card className="lg:col-span-1 border-none shadow-xl bg-white dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800">
-              <CardHeader className="border-b border-gray-100">
-                    <div className="flex justify-between items-center">
-                        <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-green-500 dark:to-blue-500">
-                         Investor Profile
-                        </h2>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            // className="hover:bg-primary"
-                            onClick={() => {
-                            setEditedProfile(profile);
-                            setIsEditing(true);
-                            }}
-                        >
-                        <BsPencil className="h-4 w-4" />
-                        </Button>
-                    </div>
-                </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-6">
-                    <div className="space-y-2">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                            {profile.firstName} {profile.lastName}
-                        </h3>
-                        <p className="text-gray-600">{profile.email}</p>
-                        <p className="text-gray-600">Net Worth: ${profile.netWorth}</p>
-                    </div>
-
-                    <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80">
-                    <HiOutlineDocumentText className="text-primary text-xl mt-1" />
-                    <div>
-                        <h3 className="font-semibold text-gray-900">Past Investments</h3>
-                        <p className="text-gray-600 mt-1">{profile.pastInvestments}</p>
-                        
-                    </div>  
-                </div>
-                </div>
-
-                 
-
-                <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80">
-                <BsCurrencyDollar className="text-primary text-xl mt-1" />
-                <div className="space-y-2">
-                    <h3 className="font-semibold text-gray-900">Investment Interests</h3>
-                        <div className="flex flex-wrap gap-2">
-                            {profile.investmentInterests.split(',').map((skill, index) => (
-                                <span
-                                    key={index}
-                                    className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium"
-                                >
-                            {skill.trim()}
-                                </span>
-                            ))}
-                        </div>
-                </div>  
-                </div>         
-
-                    
-                
-              </CardContent>
-            </Card>
+            
 
             {/* Investment Opportunities Section */}
-            <div className="lg:col-span-2 space-y-6">
-              <Card className="border-none shadow-xl bg-white">
-                <CardHeader className="border-b border-gray-100">
+            <div className="lg:col-span-3 space-y-6">
+              <Card className="lg:col-span-1 border-none shadow-xl bg-white dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800 dark:border-2 dark:border-blue-400 dark:shadow-blue-500/80">
+                <CardHeader className="border-b border-gray-100 dark:border-gray-700">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                  <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-green-500 dark:to-blue-500">
                     Investment Opportunities
                   </h2>
                     <div className="flex gap-2">
@@ -392,20 +342,20 @@ const InvestorDashboard = () => {
                       </div>
                     </div>
                 </CardHeader>
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
+                  <CardContent className="p-6 ">
+                    <div className="space-y-4 ">
                       {filteredIdeas.map((idea) => (
                         <motion.div
                           key={idea.id}
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="bg-white p-6 rounded-lg shadow-xl border border-gray-100 hover:border-primary/50 transition-all"
+                          className="bg-white p-6 rounded-lg shadow-xl border border-gray-100 hover:border-primary/50 transition-all dark:bg-gray-800 dark:border-gray-700 dark:hover:border-blue-500"
                         >
                           <div className="flex flex-col space-y-4">
                             <div className="flex justify-between items-start">
                               <div>
-                                <h3 className="text-xl font-semibold text-gray-900">{idea.cofounderRole}</h3>
-                                <p className="text-gray-600 mt-1">{idea.companyName}</p>
+                                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{idea.cofounderRole}</h3>
+                                <p className="text-gray-600 mt-1 dark:text-gray-300">{idea.companyName}</p>
                               </div>
                               <Button
                                 variant="outline"
@@ -421,7 +371,7 @@ const InvestorDashboard = () => {
                               </Button>
                             </div>
     
-                            <div className="flex flex-wrap gap-3 text-sm text-gray-600">
+                            <div className="flex flex-wrap gap-3 text-sm text-gray-600 dark:text-gray-200">
                               <span>{idea.experienceRequired} years exp</span>
                               <span>•</span>
                               <span>{idea.fundingStage}</span>
@@ -439,19 +389,19 @@ const InvestorDashboard = () => {
                               )}
                             </div>
     
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-2 ">
                               {renderinvestmentInterests(idea.techStack)}
                             </div>
     
                             <div>
-                              <h4 className="font-semibold text-gray-900 mb-2">Idea Description</h4>
-                              <p className="text-gray-600">{idea.ideaDescription}</p>
+                              <h4 className="font-semibold text-gray-900 mb-2 dark:text-gray-100">Idea Description</h4>
+                              <p className="text-gray-600 dark:text-gray-400">{idea.ideaDescription}</p>
                             </div>
     
                             {idea.roleDescription && (
                               <div>
-                                <h4 className="font-semibold text-gray-900 mb-2">Role Description</h4>
-                                <p className="text-gray-600">{idea.roleDescription}</p>
+                                <h4 className="font-semibold text-gray-900 mb-2 dark:text-gray-100">Role Description</h4>
+                                <p className="text-gray-600 dark:text-gray-400">{idea.roleDescription}</p>
                               </div>
                             )}
     
@@ -462,7 +412,7 @@ const InvestorDashboard = () => {
                                   alt="Recruiter"
                                   className="w-8 h-8 rounded-full"
                                 />
-                                <span className="text-sm text-gray-500">
+                                <span className="text-sm text-gray-500 dark:text-gray-300">
                                   Posted by {idea.email}
                                 </span>
                               </div>
@@ -563,6 +513,74 @@ const InvestorDashboard = () => {
           </div>
         </div>
       </motion.div>
+
+      {/* Overlay */}
+      {isProfileOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={() => setIsProfileOpen(false)}
+        ></div>
+      )}
+
+      {/* Sliding Profile Window */}
+      <div
+        className={`fixed top-0 right-0 w-80 h-full bg-white dark:bg-gray-800 shadow-lg transform transition-transform z-50 ${
+          isProfileOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-green-500 dark:to-blue-500">Investor Profile</h2>
+            <Button
+                variant="outline"
+                size="icon"
+                className="border flex items-center space-x-1 dark:border-blue-400"
+
+                            
+                onClick={() => {
+                setEditedProfile(profile);
+                setIsEditing(true);
+                }}
+            >
+              <BsPencil className="h-4 w-4 " />
+            </Button>
+          </div>
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
+                {profile.firstName} {profile.lastName}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">{profile.email}</p>
+              <p className="text-gray-600 dark:text-gray-400">Net Worth: ${profile.netWorth}</p>
+            </div>
+
+            <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80 dark:bg-gray-700">
+              <HiOutlineDocumentText className="h-7 w-7" />
+              <div>
+                <h3 className="font-semibold text-gray-900 dark:text-gray-200">Past Investments</h3>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">{profile.pastInvestments}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80 dark:bg-gray-700">
+              <BsCurrencyDollar className="h-5 w-5" />
+              <div className="space-y-2">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-200">Investment Interests</h3>
+                <div className="flex flex-wrap gap-2">
+                  {profile.investmentInterests.split(',').map((skill, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-primary/70 dark:text-gray-200"
+                    >
+                      {skill.trim()}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
     {/* Edit Profile Dialog */}
     <Dialog open={isEditing} onOpenChange={setIsEditing}>
