@@ -2,13 +2,14 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { BiChevronDown } from 'react-icons/bi';
+import { toggleTheme } from './theme';
 
-interface NavbarProps {
-  theme: 'light' | 'dark';
-  toggleTheme: () => void;
-}
+// interface NavbarProps {
+//   theme: 'light' | 'dark';
+//   toggleTheme: () => void;
+// }
 
-export const Navbar = ({ theme, toggleTheme }: NavbarProps) => {
+export const Navbar = ({ theme }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -37,7 +38,7 @@ export const Navbar = ({ theme, toggleTheme }: NavbarProps) => {
   
 
   return (
-    <nav className="bg-white dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <Link 

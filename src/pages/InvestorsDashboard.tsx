@@ -181,7 +181,7 @@ const InvestorDashboard = () => {
     return (
       <>
         {/* <Navbar /> */}
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4">
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4 mt-10">
           <div className="max-w-7xl mx-auto">
             <div className="animate-pulse space-y-4">
               <div className="h-8 bg-gray-200 rounded w-1/4"></div>
@@ -291,7 +291,7 @@ const InvestorDashboard = () => {
         className="min-h-screen bg-white dark:bg-gradient-to-b dark:from-[#0f0c29] dark:via-[#6b29e4] dark:to-[#24243e] text-black dark:text-white"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-between items-center mb-8 mt-10">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-red-300 dark:to-blue-500">
               Investor Dashboard
             </h1>
@@ -416,9 +416,9 @@ const InvestorDashboard = () => {
                                   Posted by {idea.email}
                                 </span>
                               </div>
-                              <div className="flex gap-2">
+                              <div className="flex justify-between items-start">
                                 <Button 
-                                  className="bg-primary hover:bg-primary/90"
+                                  className="bg-primary hover:bg-primary/90 dark:bg-gradient-to-r dark:from-blue-500 dark:to-blue-700 dark:hover:bg-gradient-to-r dark:hover:from-blue-700 dark:hover:to-blue-500"
                                   onClick={() => setSelectedIdea(idea)}
                                 >
                                   Apply Now

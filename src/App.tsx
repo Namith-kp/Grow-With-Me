@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
+import { toggleTheme } from './components/theme';
 
 // Pages
 import Index from "./pages/Index"
@@ -28,16 +29,16 @@ function App() {
     }
   }, [theme]);
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-  };
+  // const toggleTheme = () => {
+  //   const newTheme = theme === 'light' ? 'dark' : 'light';
+  //   setTheme(newTheme);
+  // };
 
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
-          <Navbar theme={theme} toggleTheme={toggleTheme} />
+          <Navbar theme={theme} />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth/developer" element={<AuthSignup userType="developer" />} />
