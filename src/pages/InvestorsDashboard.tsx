@@ -300,10 +300,11 @@ const InvestorDashboard = () => {
             size="sm"
             onClick={() => setIsProfileOpen(true)}
             className="border flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
+            
           >
             {/* <BsPerson className="h-6 w-6" /> */}
             <img src={profile.photoURL} alt="Profile" className="h-6 w-6 rounded-full" />
-            <span><h3>Profile</h3></span>
+            Profile
           </Button>
           </div>
 
@@ -327,8 +328,8 @@ const InvestorDashboard = () => {
                             onClick={() => setActiveTab(status)}
                             className={`capitalize ${
                               activeTab === status
-                                ? 'bg-primary hover:bg-primary/90'
-                                : 'hover:bg-gray-100'
+                                ? 'bg-primary hover:bg-primary/90 dark:bg-blue-600'
+                                : 'hover:bg-gray-300 hover:text-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-200'
                             }`}
                           >
                             {status}
@@ -364,9 +365,9 @@ const InvestorDashboard = () => {
                                 // className="hover:bg-primary/10"
                               >
                                 {savedIdeas.includes(idea.id) ? (
-                                  <BsBookmarkFill className="h-5 w-5 text-primary" />
+                                  <BsBookmarkFill className="h-5 w-5 text-primary dark:text-blue-400" />
                                 ) : (
-                                  <BsBookmark className="h-5 w-5" />
+                                  <BsBookmark className="h-5 w-5 " />
                                 )}
                               </Button>
                             </div>
@@ -421,7 +422,8 @@ const InvestorDashboard = () => {
                                   className="bg-primary hover:bg-primary/90 dark:bg-gradient-to-r dark:from-blue-500 dark:to-blue-700 dark:hover:bg-gradient-to-r dark:hover:from-blue-700 dark:hover:to-blue-500"
                                   onClick={() => setSelectedIdea(idea)}
                                 >
-                                  Apply Now
+                                  {activeTab === 'applied' ? 'Re-Apply Now' : 'Apply Now'}
+                                  
                                 </Button>
                               </div>
                             </div>
@@ -432,9 +434,9 @@ const InvestorDashboard = () => {
                         <motion.div
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
-                          className="bg-white p-8 rounded-lg shadow-xl text-center border border-gray-100"
+                          className="bg-white p-8 rounded-lg shadow-xl text-center border border-gray-100 dark:bg-gray-800 dark:border-gray-700"
                         >
-                          <p className="text-gray-500">No ideas found in {activeTab} category.</p>
+                          <p className="text-gray-500 dark:text-gray-300">No ideas found in {activeTab} category.</p>
                         </motion.div>
                       )}
                     </div>              
@@ -534,7 +536,7 @@ const InvestorDashboard = () => {
             <Button
                 variant="outline"
                 size="icon"
-                className="border flex items-center space-x-1 dark:border-blue-400"
+                className="border flex items-center space-x-1 dark:border-blue-400 dark:text-white"
 
                             
                 onClick={() => {
@@ -555,7 +557,7 @@ const InvestorDashboard = () => {
             </div>
 
             <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80 dark:bg-gray-700">
-              <HiOutlineDocumentText className="h-7 w-7" />
+              <HiOutlineDocumentText className="h-7 w-7 dark:text-white" />
               <div>
                 <h3 className="font-semibold text-gray-900 dark:text-gray-200">Past Investments</h3>
                 <p className="text-gray-600 dark:text-gray-400 mt-1">{profile.pastInvestments}</p>
@@ -563,7 +565,7 @@ const InvestorDashboard = () => {
             </div>
 
             <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80 dark:bg-gray-700">
-              <BsCurrencyDollar className="h-5 w-5" />
+              <BsCurrencyDollar className="h-5 w-5 dark:text-white" />
               <div className="space-y-2">
                 <h3 className="font-semibold text-gray-900 dark:text-gray-200">Investment Interests</h3>
                 <div className="flex flex-wrap gap-2">
@@ -584,21 +586,21 @@ const InvestorDashboard = () => {
 
     {/* Edit Profile Dialog */}
     <Dialog open={isEditing} onOpenChange={setIsEditing}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md dark:bg-gray-800">
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium">First Name</label>
+              <label className="text-sm font-medium dark:text-gray-100">First Name</label>
               <Input
                 value={editedProfile?.firstName}
                 onChange={(e) => setEditedProfile(prev => prev ? {...prev, firstName: e.target.value} : null)}
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Last Name</label>
+              <label className="text-sm font-medium dark:text-gray-100">Last Name</label>
               <Input
                 value={editedProfile?.lastName}
                 onChange={(e) => setEditedProfile(prev => prev ? {...prev, lastName: e.target.value} : null)}
@@ -615,7 +617,7 @@ const InvestorDashboard = () => {
           </div>
 
           <div>
-            <label className="text-sm font-medium">Net Worth</label>
+            <label className="text-sm font-medium">Net Worth $</label>
             <Input
               value={editedProfile?.netWorth}
               onChange={(e) => setEditedProfile(prev => prev ? {...prev, netWorth: e.target.value} : null)}
@@ -624,7 +626,7 @@ const InvestorDashboard = () => {
 
           <div>
             <label className="text-sm font-medium">Past Investments</label>
-            <Input
+            <Textarea
               value={editedProfile?.pastInvestments}
               onChange={(e) => setEditedProfile(prev => prev ? {...prev, pastInvestments: e.target.value} : null)}
             />
@@ -634,7 +636,7 @@ const InvestorDashboard = () => {
             <Button variant="outline" onClick={() => setIsEditing(false)}>
               Cancel
             </Button>
-            <Button onClick={handleProfileUpdate}>
+            <Button variant="outline" onClick={handleProfileUpdate}>
               Save Changes
             </Button>
           </div>
