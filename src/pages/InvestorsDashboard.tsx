@@ -77,7 +77,8 @@ const InvestorDashboard = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [sortOption, setSortOption] = useState<'newest' | 'oldest' | 'below10000' | '20000to30000' | 'above30000'>('newest');
+  const [sortOption, setSortOption] = useState<'newest' | 'oldest'>('newest');
+  const [equityRange, setEquityRange] = useState<'below1' | '1to5' | '5to10' |'above10'>('below1');
 
   
 
@@ -220,21 +221,23 @@ const InvestorDashboard = () => {
       );
     }
     return true;
+  }).filter(idea => {
+    const equity = parseFloat(idea.equityRange.replace('%', ''));                                                                                           
+    if (equityRange === 'below1') {
+      return equity < 1;                                          
+    } else if (equityRange === '1to5') {
+      return equity >= 1 && equity <= 5;
+    } else if (equityRange === '5to10') {
+      return equity >= 5 && equity <= 10;
+    } else if (equityRange === 'above10') {
+      return equity > 10;
+    }
+    return true;
   }).sort((a, b) => {
     if (sortOption === 'newest') {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     } else if (sortOption === 'oldest') {
       return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-    } else if (sortOption === 'below10000') {
-      return parseFloat(a.equityRange) - parseFloat(b.equityRange);
-    } else if (sortOption === '20000to30000') {
-      const aEquity = parseFloat(a.equityRange);
-      const bEquity = parseFloat(b.equityRange);
-      if (aEquity >= 20000 && aEquity <= 30000) return -1;
-      if (bEquity >= 20000 && bEquity <= 30000) return 1;
-      return 0;
-    } else if (sortOption === 'above30000') {
-      return parseFloat(b.equityRange) - parseFloat(a.equityRange);
     }
     return 0;
   });
@@ -334,7 +337,7 @@ const InvestorDashboard = () => {
                     placeholder="Search..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="p-2 pl-10 border border-gray-300 rounded-full"
+                    className="p-2 pl-10 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-2 dark:focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   />
                   <BsSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 </div>
@@ -342,21 +345,21 @@ const InvestorDashboard = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => setIsFilterOpen(true)}
-                  className="border-gray-700 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
+                  className="border-gray-300 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
                 >
                   <BsFilter className="h-5 w-5" />
-                  <span>Filter</span>
+                  
                 </Button>        
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setIsProfileOpen(true)}
-                  className="border-gray-700 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
+                  className="border-gray-300 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
                   
                 >
                   {/* <BsPerson className="h-6 w-6" /> */}
                   <img src={profile.photoURL} alt="Profile" className="h-6 w-6 rounded-full" />
-                  
+                  Profile
               </Button>
           </div>
           </div>
@@ -698,35 +701,46 @@ const InvestorDashboard = () => {
               <label className="flex items-center">
                 <input
                   type="radio"
-                  name="sortOption"
-                  value="below10000"
-                  checked={sortOption === 'below10000'}
-                  onChange={() => setSortOption('below10000')}
+                  name="equityRange"
+                  value="below1"
+                  checked={equityRange === 'below1'}
+                  onChange={() => setEquityRange('below1')}
                   className="form-radio"
                 />
-                <span className="ml-2 dark:text-gray-200">Below 10,000</span>
+                <span className="ml-2 dark:text-gray-200">Below 1%</span>
               </label>
               <label className="flex items-center">
                 <input
                   type="radio"
-                  name="sortOption"
-                  value="20000to30000"
-                  checked={sortOption === '20000to30000'}
-                  onChange={() => setSortOption('20000to30000')}
+                  name="equityRange"
+                  value="1to5"
+                  checked={equityRange === '1to5'}
+                  onChange={() => setEquityRange('1to5')}
                   className="form-radio"
                 />
-                <span className="ml-2 dark:text-gray-200">20,000 - 30,000</span>
+                <span className="ml-2 dark:text-gray-200">1-5%</span>
               </label>
               <label className="flex items-center">
                 <input
                   type="radio"
-                  name="sortOption"
-                  value="above30000"
-                  checked={sortOption === 'above30000'}
-                  onChange={() => setSortOption('above30000')}
+                  name="equityRange"
+                  value="5to10"
+                  checked={equityRange === '5to10'}
+                  onChange={() => setEquityRange('5to10')}
                   className="form-radio"
                 />
-                <span className="ml-2 dark:text-gray-200">Above 30,000</span>
+                <span className="ml-2 dark:text-gray-200">5-10%</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="equityRange"
+                  value="above10"
+                  checked={equityRange === 'above10'}
+                  onChange={() => setEquityRange('above10')}
+                  className="form-radio"
+                />
+                <span className="ml-2 dark:text-gray-200">Above 10%</span>
               </label>
             </div>
           </div>
