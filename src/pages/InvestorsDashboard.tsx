@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { BsCurrencyDollar } from "react-icons/bs";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
-import { BsPencil, BsBookmark, BsBookmarkFill,BsPerson } from "react-icons/bs";
+import { BsPencil, BsBookmark, BsBookmarkFill,BsPerson, BsSearch, BsFilter } from "react-icons/bs";
 import { useLocation } from "react-router-dom";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { useToast } from "@/components/ui/use-toast";
@@ -75,6 +75,11 @@ const InvestorDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [sortOption, setSortOption] = useState<'newest' | 'oldest' | 'below10000' | '20000to30000' | 'above30000'>('newest');
+
+  
 
     const [applicationData, setApplicationData] = useState({
         coverLetter: "",
@@ -205,7 +210,33 @@ const InvestorDashboard = () => {
   const filteredIdeas = ideas.filter(idea => {
     if (activeTab === 'saved') return savedIdeas.includes(idea.id);
     // Add applied ideas filter when you have that data
+    if (searchQuery) {
+      const lowerCaseQuery = searchQuery.toLowerCase();
+      return (
+        idea.cofounderRole.toLowerCase().includes(lowerCaseQuery) ||
+        idea.companyName.toLowerCase().includes(lowerCaseQuery) ||
+        idea.email.toLowerCase().includes(lowerCaseQuery)||
+        idea.ideaDescription.toLowerCase().includes(lowerCaseQuery)
+      );
+    }
     return true;
+  }).sort((a, b) => {
+    if (sortOption === 'newest') {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    } else if (sortOption === 'oldest') {
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    } else if (sortOption === 'below10000') {
+      return parseFloat(a.equityRange) - parseFloat(b.equityRange);
+    } else if (sortOption === '20000to30000') {
+      const aEquity = parseFloat(a.equityRange);
+      const bEquity = parseFloat(b.equityRange);
+      if (aEquity >= 20000 && aEquity <= 30000) return -1;
+      if (bEquity >= 20000 && bEquity <= 30000) return 1;
+      return 0;
+    } else if (sortOption === 'above30000') {
+      return parseFloat(b.equityRange) - parseFloat(a.equityRange);
+    }
+    return 0;
   });
 
   const handleProfileUpdate = async () => {
@@ -281,10 +312,11 @@ const InvestorDashboard = () => {
         setIsSubmitting(false);
       }
     };
+    
 
   return (
     <>
-      {/* <Navbar /> */}
+      {/* <navbar /> */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -295,18 +327,41 @@ const InvestorDashboard = () => {
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-red-300 dark:to-blue-500">
               Investor Dashboard
             </h1>
-            <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsProfileOpen(true)}
-            className="border-gray-700 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
-            
-          >
-            {/* <BsPerson className="h-6 w-6" /> */}
-            <img src={profile.photoURL} alt="Profile" className="h-6 w-6 rounded-full" />
-            
-          </Button>
+            <div className="flex items-center gap-4 ">
+                <div className="relative ">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="p-2 pl-10 border border-gray-300 rounded-full"
+                  />
+                  <BsSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsFilterOpen(true)}
+                  className="border-gray-700 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
+                >
+                  <BsFilter className="h-5 w-5" />
+                  <span>Filter</span>
+                </Button>        
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsProfileOpen(true)}
+                  className="border-gray-700 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
+                  
+                >
+                  {/* <BsPerson className="h-6 w-6" /> */}
+                  <img src={profile.photoURL} alt="Profile" className="h-6 w-6 rounded-full" />
+                  
+              </Button>
           </div>
+          </div>
+
+          
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
@@ -583,6 +638,101 @@ const InvestorDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Filter Slide Window */}
+    {isFilterOpen && (
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 z-40"
+        onClick={() => setIsFilterOpen(false)}
+      ></div>
+    )}
+
+    <div
+      className={`fixed top-0 right-0 w-80 h-full bg-white dark:bg-gray-800 shadow-lg transform transition-transform z-50 ${
+        isFilterOpen ? 'translate-x-0' : 'translate-x-full'
+      }`}
+    >
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-green-500 dark:to-blue-500">Filter Options</h2>
+          <Button
+            variant="outline"
+            size="icon"
+            className="border flex items-center space-x-1 dark:border-blue-400 dark:text-white"
+            onClick={() => setIsFilterOpen(false)}
+          >
+            <BsFilter className="h-4 w-4 " />
+          </Button>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm font-medium dark:text-gray-100">Sort By</label>
+            <div className="flex flex-col space-y-2 mt-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="sortOption"
+                  value="newest"
+                  checked={sortOption === 'newest'}
+                  onChange={() => setSortOption('newest')}
+                  className="form-radio"
+                />
+                <span className="ml-2 dark:text-gray-200">Newest</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="sortOption"
+                  value="oldest"
+                  checked={sortOption === 'oldest'}
+                  onChange={() => setSortOption('oldest')}
+                  className="form-radio"
+                />
+                <span className="ml-2 dark:text-gray-200">Oldest</span>
+              </label>
+            </div>
+          </div>
+          <div>
+            <label className="text-sm font-medium dark:text-gray-100">Equity Range</label>
+            <div className="flex flex-col space-y-2 mt-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="sortOption"
+                  value="below10000"
+                  checked={sortOption === 'below10000'}
+                  onChange={() => setSortOption('below10000')}
+                  className="form-radio"
+                />
+                <span className="ml-2 dark:text-gray-200">Below 10,000</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="sortOption"
+                  value="20000to30000"
+                  checked={sortOption === '20000to30000'}
+                  onChange={() => setSortOption('20000to30000')}
+                  className="form-radio"
+                />
+                <span className="ml-2 dark:text-gray-200">20,000 - 30,000</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="sortOption"
+                  value="above30000"
+                  checked={sortOption === 'above30000'}
+                  onChange={() => setSortOption('above30000')}
+                  className="form-radio"
+                />
+                <span className="ml-2 dark:text-gray-200">Above 30,000</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     {/* Edit Profile Dialog */}
     <Dialog open={isEditing} onOpenChange={setIsEditing}>
