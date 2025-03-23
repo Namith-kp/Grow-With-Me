@@ -6,7 +6,7 @@ export const Hero = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-blue-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-16">
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
           Connect with Your Perfect <br></br>Co-Founder
         </h1>

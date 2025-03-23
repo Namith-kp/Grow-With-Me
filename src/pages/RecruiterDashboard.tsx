@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { BsBuilding, BsCurrencyDollar, BsPencil, BsBriefcase } from "react-icons/bs";
+import { BsBuilding, BsCurrencyDollar, BsPencil, BsBriefcase,  BsSearch } from "react-icons/bs";
 import { HiOutlineDocumentText, HiOutlineUsers } from "react-icons/hi";
 import { FaWhatsapp } from "react-icons/fa";
 import { motion } from "framer-motion";
@@ -104,7 +104,9 @@ export const RecruiterDashboard = () => {
   const [showInvestorApplicationDetails, setShowInvestorApplicationDetails] = useState(false);
   const [selectedInvestorApplication, setSelectedInvestorApplication] = useState<InvestorApplication | null>(null);
   const [activeApplicationTab, setActiveApplicationTab] = useState<'developers' | 'investors'>('developers');
-
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredDeveloperCandidates, setFilteredDevelopers] = useState<Candidate[]>([]);
+  const [filteredInvestorApplications, setFilteredInvestors] = useState<InvestorApplication[]>([]);
 
   const handleViewCandidate = (candidate: Candidate) => {
     setSelectedCandidate(candidate);
@@ -311,6 +313,22 @@ export const RecruiterDashboard = () => {
     fetchData();
   }, [location.state?.uid, toast]);
 
+  useEffect(() => {
+    const lowercasedQuery = searchQuery.toLowerCase();
+    setFilteredDevelopers(
+      developerCandidates.filter(candidate =>
+        candidate.name.toLowerCase().includes(lowercasedQuery) ||
+        candidate.skills.some(skill => skill.toLowerCase().includes(lowercasedQuery))
+      )
+    );
+    setFilteredInvestors(
+      investorApplications.filter(application =>
+        application.name.toLowerCase().includes(lowercasedQuery) ||
+        application.investmentInterests.toLowerCase().includes(lowercasedQuery)
+      )
+    );
+  }, [searchQuery, developerCandidates, investorApplications]);
+
   const handleProfileUpdate = async () => {
     if (!editedProfile || !location.state?.uid) return;
 
@@ -404,8 +422,8 @@ export const RecruiterDashboard = () => {
     );
   }
 
-  const filteredDeveloperCandidates = developerCandidates.filter(candidate => candidate.status === activeTab);
-  const filteredInvestorApplications = investorApplications.filter(application => application.status === activeTab);
+  // const filteredDeveloperCandidates = developerCandidates.filter(candidate => candidate.status === activeTab);
+  // const filteredInvestorApplications = investorApplications.filter(application => application.status === activeTab);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -418,10 +436,21 @@ export const RecruiterDashboard = () => {
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Header Section */}
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-between items-center mb-8 mt-10">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-red-300 dark:to-blue-500">
               Founder Dashboard
             </h1>
+            <div className="flex items-center gap-4 ">
+            <div className="relative ">
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="p-2 pl-10 border border-gray-300 rounded-full"
+              />
+              <BsSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            </div>
             <Button 
               variant="outline"
               className="flex items-center gap-2 hover:bg-primary hover:text-white transition-colors"
@@ -440,6 +469,7 @@ export const RecruiterDashboard = () => {
               Post Idea
             </Button>
           </div>
+        </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Profile Section */}

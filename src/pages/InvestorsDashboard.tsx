@@ -288,7 +288,7 @@ const InvestorDashboard = () => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="min-h-screen bg-white dark:bg-gradient-to-b dark:from-[#0f0c29] dark:via-[#6b29e4] dark:to-[#24243e] text-black dark:text-white"
+        className="min-h-screen bg-white transition-all duration-300 dark:bg-gradient-to-b dark:from-[#0f0c29] dark:via-[#6b29e4] dark:to-[#24243e] text-black dark:text-white"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex justify-between items-center mb-8 mt-10">
@@ -299,12 +299,12 @@ const InvestorDashboard = () => {
             variant="outline"
             size="sm"
             onClick={() => setIsProfileOpen(true)}
-            className="border flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
+            className="border-gray-700 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
             
           >
             {/* <BsPerson className="h-6 w-6" /> */}
             <img src={profile.photoURL} alt="Profile" className="h-6 w-6 rounded-full" />
-            Profile
+            
           </Button>
           </div>
 
@@ -313,10 +313,10 @@ const InvestorDashboard = () => {
 
             {/* Investment Opportunities Section */}
             <div className="lg:col-span-3 space-y-6">
-              <Card className="lg:col-span-1 border-none shadow-xl bg-white dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800 dark:border-2 dark:border-blue-400 dark:shadow-blue-500/80">
+              <Card className="lg:col-span-1 border-none shadow-xl bg-gray-100 duration-300 dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800 dark:border-2 dark:border-blue-400 dark:shadow-blue-500/80">
                 <CardHeader className="border-b border-gray-100 dark:border-gray-700">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                  <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-green-500 dark:to-blue-500">
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent transition-all duration-300 dark:from-green-500 dark:to-blue-500">
                     Investment Opportunities
                   </h2>
                     <div className="flex gap-2">
@@ -344,13 +344,13 @@ const InvestorDashboard = () => {
                     </div>
                 </CardHeader>
                   <CardContent className="p-6 ">
-                    <div className="space-y-4 ">
+                    <div className="space-y-4">
                       {filteredIdeas.map((idea) => (
                         <motion.div
                           key={idea.id}
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="bg-white p-6 rounded-lg shadow-xl border border-gray-100 hover:border-primary/50 transition-all dark:bg-gray-800 dark:border-gray-700 dark:hover:border-blue-500"
+                          className="bg-white p-6 rounded-lg shadow-xl border border-gray-100 hover:border-primary/50 transition-all duration-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-blue-500"
                         >
                           <div className="flex flex-col space-y-4">
                             <div className="flex justify-between items-start">
@@ -362,7 +362,7 @@ const InvestorDashboard = () => {
                                 variant="outline"
                                 size="icon"
                                 onClick={() => toggleSaveIdea(idea.id)}
-                                // className="hover:bg-primary/10"
+                                className="duration-300"
                               >
                                 {savedIdeas.includes(idea.id) ? (
                                   <BsBookmarkFill className="h-5 w-5 text-primary dark:text-blue-400" />
@@ -647,7 +647,7 @@ const InvestorDashboard = () => {
     {/* Apply Dialog */}
     {selectedIdea && (
       <Dialog open={!!selectedIdea} onOpenChange={() => setSelectedIdea(null)}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-3xl dark:bg-gray-800">
           <DialogHeader>
             <DialogTitle>Apply for {selectedIdea.companyName}</DialogTitle>
           </DialogHeader>
@@ -682,6 +682,7 @@ const InvestorDashboard = () => {
             <div className="flex justify-end space-x-2">
               <Button variant="outline" onClick={() => setSelectedIdea(null)}>Cancel</Button>
               <Button 
+                variant="outline"
                 onClick={() => handleSubmitApplication(selectedIdea.id)}
                 disabled={isSubmitting || !applicationData.coverLetter  || !applicationData.whatsappNumber}
               >
