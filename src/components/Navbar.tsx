@@ -3,13 +3,14 @@ import { Button } from '@/components/ui/button';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { BiChevronDown } from 'react-icons/bi';
 import { toggleTheme } from './theme';
+import { BsList } from "react-icons/bs";
 
 // interface NavbarProps {
 //   theme: 'light' | 'dark';
 //   toggleTheme: () => void;
 // }
 
-export const Navbar = ({ theme }) => {
+export const Navbar = ({ theme,setIsSideMenuOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -19,6 +20,8 @@ export const Navbar = ({ theme }) => {
   const isHomePage = location.pathname === '/';
   const isAuthPage = location.pathname.startsWith('/auth/');
   const showSignOut = !isHomePage && !isAuthPage;
+
+  
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -41,12 +44,20 @@ export const Navbar = ({ theme }) => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          <Link 
-            to="/" 
-            className="text-2xl font-extrabold text-primary dark:text-dark-foreground tracking-tight hover:opacity-80 transition-opacity"
-          >
-            Grow With Me
-          </Link>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setIsSideMenuOpen(true)}
+              className="text-gray-600 dark:text-gray-300 sm:hidden"
+            >
+              <BsList className="h-6 w-6" />
+            </button>
+            <Link 
+              to="/" 
+              className="text-2xl font-extrabold text-primary dark:text-dark-foreground tracking-tight hover:opacity-80 transition-opacity"
+            >
+              Grow With Me
+            </Link>
+          </div>
           <div className="flex gap-4 items-center">
             {showSignOut ? (
               <>

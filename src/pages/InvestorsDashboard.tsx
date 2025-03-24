@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { BsCurrencyDollar } from "react-icons/bs";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
-import { BsPencil, BsBookmark, BsBookmarkFill,BsPerson, BsSearch, BsFilter } from "react-icons/bs";
+import { BsPencil, BsBookmark, BsBookmarkFill,BsPerson, BsSearch, BsFilter, BsList } from "react-icons/bs";
 import { useLocation } from "react-router-dom";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { useToast } from "@/components/ui/use-toast";
@@ -79,8 +79,9 @@ const InvestorDashboard = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [sortOption, setSortOption] = useState<'newest' | 'oldest'>('newest');
   const [equityRange, setEquityRange] = useState<'below1' | '1to5' | '5to10' |'above10'>('below1');
-
-  
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
+  const [theme, setTheme] = useState('light'); // Add theme state
 
     const [applicationData, setApplicationData] = useState({
         coverLetter: "",
@@ -187,7 +188,7 @@ const InvestorDashboard = () => {
     return (
       <>
         {/* <Navbar /> */}
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4 mt-10">
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4 mt-10 dark:bg-gradient-to-b dark:from-[#0f0c29] dark:via-[#6b29e4] dark:to-[#24243e] text-black dark:text-white">
           <div className="max-w-7xl mx-auto">
             <div className="animate-pulse space-y-4">
               <div className="h-8 bg-gray-200 rounded w-1/4"></div>
@@ -315,60 +316,117 @@ const InvestorDashboard = () => {
         setIsSubmitting(false);
       }
     };
+
     
+
+    const SideNavBar = ({ activeTab, setActiveTab, setIsFilterOpen, setIsProfileOpen, isSideMenuOpen, setIsSideMenuOpen }) => {
+      return (
+        <div className={`fixed top-16 left-0 h-full w-64 bg-white border-r border-gray-300 dark:bg-gray-900 dark:border-gray-700 shadow-lg z-50 transform transition-transform ${isSideMenuOpen ? 'translate-x-0' : '-translate-x-full'} sm:translate-x-0`}>
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-green-500 dark:to-blue-500">
+                Menu
+              </h2>
+              <button
+                onClick={() => setIsSideMenuOpen(false)}
+                className="text-gray-600 dark:text-gray-300 sm:hidden"
+              >
+                <BsList className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="mt-6 space-y-4">
+              <div className="flex flex-col space-y-2">
+                {(['all', 'saved', 'applied'] as const).map((status) => (
+                  <Button
+                    key={status}
+                    variant={activeTab === status ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setActiveTab(status)}
+                    className={`capitalize ${
+                      activeTab === status
+                      ? 'bg-primary hover:bg-primary/90 dark:bg-blue-600'
+                      : 'hover:bg-gray-300 text-gray-300 hover:text-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-200'
+                  }`}
+                  >
+                    {status}
+                    {activeTab === status && (
+                      <span className="ml-2 bg-white/20 px-1.5 py-0.5 rounded-full text-xs">
+                        {filteredIdeas.length}
+                      </span>
+                    )}
+                  </Button>
+                ))}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsFilterOpen(true)}
+                className="border-gray-300 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
+              >
+                <BsFilter className="h-5 w-5" />
+                Filter
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsProfileOpen(true)}
+                className="border-gray-300 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
+              >
+                <img src={profile.photoURL} alt="Profile" className="h-6 w-6 rounded-full" />
+                Profile
+              </Button>
+            </div>
+          </div>
+        </div>
+      );
+    };
 
   return (
     <>
+      <Navbar theme={theme} setIsSideMenuOpen={setIsSideMenuOpen} />
+      <SideNavBar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        setIsFilterOpen={setIsFilterOpen}
+        setIsProfileOpen={setIsProfileOpen}
+        isSideMenuOpen={isSideMenuOpen}
+        setIsSideMenuOpen={setIsSideMenuOpen}
+      />
+
+      {isSideMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 sm:hidden"
+          onClick={() => setIsSideMenuOpen(false)}
+        ></div>
+      )}
       {/* <navbar /> */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="min-h-screen bg-white transition-all duration-300 dark:bg-gradient-to-b dark:from-[#0f0c29] dark:via-[#6b29e4] dark:to-[#24243e] text-black dark:text-white"
+        className={`min-h-screen bg-white transition-all duration-300 dark:bg-gradient-to-b dark:from-[#0f0c29] dark:via-[#6b29e4] dark:to-[#24243e] text-black dark:text-white sm:ml-64`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex justify-between items-center mb-8 mt-10">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 mt-10">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-red-300 dark:to-blue-500">
               Investor Dashboard
             </h1>
-            <div className="flex items-center gap-4 ">
-                <div className="relative ">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="p-2 pl-10 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-2 dark:focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  />
-                  <BsSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsFilterOpen(true)}
-                  className="border-gray-300 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
-                >
-                  <BsFilter className="h-5 w-5" />
-                  
-                </Button>        
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsProfileOpen(true)}
-                  className="border-gray-300 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
-                  
-                >
-                  {/* <BsPerson className="h-6 w-6" /> */}
-                  <img src={profile.photoURL} alt="Profile" className="h-6 w-6 rounded-full" />
-                  Profile
-              </Button>
-          </div>
+            <div className="hidden sm:flex flex-col sm:flex-row items-center gap-4 mt-4 sm:mt-0 w-full sm:w-auto">
+              <div className="relative w-full sm:w-auto flex-grow">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full p-2 pl-10 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-2 dark:focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+                <BsSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              </div>
+            </div>
           </div>
 
           
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 overflow-y-auto h-[calc(100vh-200px)]">
             {/* Investment Opportunities Section */}
             <div className="lg:col-span-3 space-y-6">
               <Card className="lg:col-span-1 border-none shadow-xl bg-gray-100 duration-300 dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800 dark:border-2 dark:border-blue-400 dark:shadow-blue-500/80">
@@ -572,6 +630,33 @@ const InvestorDashboard = () => {
             </div>
           </div>
         </div>
+        {/* Bottom bar for mobile devices */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700 sm:hidden">
+            <div className="flex justify-around items-center py-2">
+              <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="text-gray-600 dark:text-gray-300">
+                <BsSearch className="h-6 w-6" />
+              </button>
+              <button onClick={() => setIsProfileOpen(true)} className="text-gray-600 dark:text-gray-300">
+              <img src={profile.photoURL} alt="Profile" className="h-6 w-6 rounded-full" />
+              </button>
+            </div>
+          </div>
+
+          {/* Search bar for mobile devices */}
+          {isSearchOpen && (
+            <div className="fixed bottom-16 left-0 right-0 bg-white dark:bg-transparent  sm:hidden"> 
+              <div className="relative w-full p-2">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full p-2 pl-10 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+                <BsSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              </div>
+            </div>
+          )}
       </motion.div>
 
       {/* Overlay */}
