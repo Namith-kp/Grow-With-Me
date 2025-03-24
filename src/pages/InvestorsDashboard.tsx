@@ -78,7 +78,7 @@ const InvestorDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [sortOption, setSortOption] = useState<'newest' | 'oldest'>('newest');
-  const [equityRange, setEquityRange] = useState<'below1' | '1to5' | '5to10' |'above10'>('below1');
+  const [equityRange, setEquityRange] = useState<'all'|'below1' | '1to5' | '5to10' |'above10'>('all');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const [theme, setTheme] = useState('light'); // Add theme state
@@ -223,6 +223,7 @@ const InvestorDashboard = () => {
     }
     return true;
   }).filter(idea => {
+    if (equityRange === 'all') return true;
     const equity = parseFloat(idea.equityRange.replace('%', ''));                                                                                           
     if (equityRange === 'below1') {
       return equity < 1;                                          
@@ -319,10 +320,10 @@ const InvestorDashboard = () => {
 
     
 
-    const SideNavBar = ({ activeTab, setActiveTab, setIsFilterOpen, setIsProfileOpen, isSideMenuOpen, setIsSideMenuOpen }) => {
+    const SideNavBar = ({ activeTab, setActiveTab, setIsProfileOpen, isSideMenuOpen, setIsSideMenuOpen, isFilterOpen, setIsFilterOpen }) => {
       return (
-        <div className={`fixed top-16 left-0 h-full w-64 bg-white border-r border-gray-300 dark:bg-gray-900 dark:border-gray-700 shadow-lg z-50 transform transition-transform ${isSideMenuOpen ? 'translate-x-0' : '-translate-x-full'} sm:translate-x-0`}>
-          <div className="p-6">
+        <div className={`fixed top-16 left-0 h-full w-64 bg-white border-r border-gray-300 dark:bg-gray-900 dark:border-gray-700 shadow-lg z-50 transform transition-transform ${isSideMenuOpen ? 'translate-x-0' : '-translate-x-full'} sm:translate-x-0 `}>
+          <div className="p-6 ">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-green-500 dark:to-blue-500">
                 Menu
@@ -344,9 +345,9 @@ const InvestorDashboard = () => {
                     onClick={() => setActiveTab(status)}
                     className={`capitalize ${
                       activeTab === status
-                      ? 'bg-primary hover:bg-primary/90 dark:bg-blue-600'
-                      : 'hover:bg-gray-300 text-gray-300 hover:text-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-200'
-                  }`}
+                        ? 'bg-primary hover:bg-primary/90 dark:bg-blue-600'
+                        : 'hover:bg-gray-300 text-gray-300 hover:text-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-200'
+                    }`}
                   >
                     {status}
                     {activeTab === status && (
@@ -357,15 +358,104 @@ const InvestorDashboard = () => {
                   </Button>
                 ))}
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsFilterOpen(true)}
-                className="border-gray-300 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
-              >
-                <BsFilter className="h-5 w-5" />
-                Filter
-              </Button>
+              <div className="relative">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  className="border-gray-300 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
+                >
+                  <BsFilter className="h-5 w-5" />
+                  Filter
+                </Button>
+                {isFilterOpen && (
+                  <div className="absolute left-0 mt-2 w-full bg-white dark:bg-gray-800 border rounded-md shadow-lg py-2 z-50">
+                    <div className="px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-200">Sort By</div>
+                    <div className="px-4 py-2">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="sortOption"
+                          value="newest"
+                          checked={sortOption === 'newest'}
+                          onChange={() => setSortOption('newest')}
+                          className="form-radio"
+                        />
+                        <span className="ml-2 dark:text-gray-200">Newest</span>
+                      </label>
+                      <label className="flex items-center mt-2">
+                        <input
+                          type="radio"
+                          name="sortOption"
+                          value="oldest"
+                          checked={sortOption === 'oldest'}
+                          onChange={() => setSortOption('oldest')}
+                          className="form-radio"
+                        />
+                        <span className="ml-2 dark:text-gray-200">Oldest</span>
+                      </label>
+                    </div>
+                    <div className="px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-200">Equity Range</div>
+                    <div className="px-4 py-2">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="equityRange"
+                          value="all"
+                          checked={equityRange === 'all'}
+                          onChange={() => setEquityRange('all')}
+                          className="form-radio"
+                        />
+                        <span className="ml-2 dark:text-gray-200">All</span>
+                      </label>
+                      <label className="flex items-center mt-2">
+                        <input
+                          type="radio"
+                          name="equityRange"
+                          value="below1"
+                          checked={equityRange === 'below1'}
+                          onChange={() => setEquityRange('below1')}
+                          className="form-radio"
+                        />
+                        <span className="ml-2 dark:text-gray-200">Below 1%</span>
+                      </label>
+                      <label className="flex items-center mt-2">
+                        <input
+                          type="radio"
+                          name="equityRange"
+                          value="1to5"
+                          checked={equityRange === '1to5'}
+                          onChange={() => setEquityRange('1to5')}
+                          className="form-radio"
+                        />
+                        <span className="ml-2 dark:text-gray-200">1-5%</span>
+                      </label>
+                      <label className="flex items-center mt-2">
+                        <input
+                          type="radio"
+                          name="equityRange"
+                          value="5to10"
+                          checked={equityRange === '5to10'}
+                          onChange={() => setEquityRange('5to10')}
+                          className="form-radio"
+                        />
+                        <span className="ml-2 dark:text-gray-200">5-10%</span>
+                      </label>
+                      <label className="flex items-center mt-2">
+                        <input
+                          type="radio"
+                          name="equityRange"
+                          value="above10"
+                          checked={equityRange === 'above10'}
+                          onChange={() => setEquityRange('above10')}
+                          className="form-radio"
+                        />
+                        <span className="ml-2 dark:text-gray-200">Above 10%</span>
+                      </label>
+                    </div>
+                  </div>
+                )}
+              </div>
               <Button
                 variant="outline"
                 size="sm"
@@ -387,10 +477,11 @@ const InvestorDashboard = () => {
       <SideNavBar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        setIsFilterOpen={setIsFilterOpen}
         setIsProfileOpen={setIsProfileOpen}
         isSideMenuOpen={isSideMenuOpen}
         setIsSideMenuOpen={setIsSideMenuOpen}
+        isFilterOpen={isFilterOpen}
+        setIsFilterOpen={setIsFilterOpen}
       />
 
       {isSideMenuOpen && (
@@ -426,7 +517,7 @@ const InvestorDashboard = () => {
 
           
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 overflow-y-auto h-[calc(100vh-200px)]">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 ">
             {/* Investment Opportunities Section */}
             <div className="lg:col-span-3 space-y-6">
               <Card className="lg:col-span-1 border-none shadow-xl bg-gray-100 duration-300 dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800 dark:border-2 dark:border-blue-400 dark:shadow-blue-500/80">
@@ -726,112 +817,6 @@ const InvestorDashboard = () => {
           </div>
         </div>
       </div>
-
-      {/* Filter Slide Window */}
-    {isFilterOpen && (
-      <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-40"
-        onClick={() => setIsFilterOpen(false)}
-      ></div>
-    )}
-
-    <div
-      className={`fixed top-0 right-0 w-80 h-full bg-white dark:bg-gray-800 shadow-lg transform transition-transform z-50 ${
-        isFilterOpen ? 'translate-x-0' : 'translate-x-full'
-      }`}
-    >
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-green-500 dark:to-blue-500">Filter Options</h2>
-          <Button
-            variant="outline"
-            size="icon"
-            className="border flex items-center space-x-1 dark:border-blue-400 dark:text-white"
-            onClick={() => setIsFilterOpen(false)}
-          >
-            <BsFilter className="h-4 w-4 " />
-          </Button>
-        </div>
-        <div className="space-y-4">
-          <div>
-            <label className="text-sm font-medium dark:text-gray-100">Sort By</label>
-            <div className="flex flex-col space-y-2 mt-2">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="sortOption"
-                  value="newest"
-                  checked={sortOption === 'newest'}
-                  onChange={() => setSortOption('newest')}
-                  className="form-radio"
-                />
-                <span className="ml-2 dark:text-gray-200">Newest</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="sortOption"
-                  value="oldest"
-                  checked={sortOption === 'oldest'}
-                  onChange={() => setSortOption('oldest')}
-                  className="form-radio"
-                />
-                <span className="ml-2 dark:text-gray-200">Oldest</span>
-              </label>
-            </div>
-          </div>
-          <div>
-            <label className="text-sm font-medium dark:text-gray-100">Equity Range</label>
-            <div className="flex flex-col space-y-2 mt-2">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="equityRange"
-                  value="below1"
-                  checked={equityRange === 'below1'}
-                  onChange={() => setEquityRange('below1')}
-                  className="form-radio"
-                />
-                <span className="ml-2 dark:text-gray-200">Below 1%</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="equityRange"
-                  value="1to5"
-                  checked={equityRange === '1to5'}
-                  onChange={() => setEquityRange('1to5')}
-                  className="form-radio"
-                />
-                <span className="ml-2 dark:text-gray-200">1-5%</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="equityRange"
-                  value="5to10"
-                  checked={equityRange === '5to10'}
-                  onChange={() => setEquityRange('5to10')}
-                  className="form-radio"
-                />
-                <span className="ml-2 dark:text-gray-200">5-10%</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="equityRange"
-                  value="above10"
-                  checked={equityRange === 'above10'}
-                  onChange={() => setEquityRange('above10')}
-                  className="form-radio"
-                />
-                <span className="ml-2 dark:text-gray-200">Above 10%</span>
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
     {/* Edit Profile Dialog */}
     <Dialog open={isEditing} onOpenChange={setIsEditing}>
