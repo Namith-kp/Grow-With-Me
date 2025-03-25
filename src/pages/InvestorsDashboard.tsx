@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { getFirestore, doc, getDoc, collection, query, getDocs, updateDoc } from 'firebase/firestore';
 import { getInvestmentOpportunities, getPortfolioPerformance, submitInvestmentInterest, getActiveJobs } from "@/lib/investor";
+import './InvestorsDashboard.css';
 
 interface InvestorProfile {
   firstName: string;
@@ -322,158 +323,195 @@ const InvestorDashboard = () => {
 
     const SideNavBar = ({ activeTab, setActiveTab, setIsProfileOpen, isSideMenuOpen, setIsSideMenuOpen, isFilterOpen, setIsFilterOpen }) => {
       return (
-        <div className={`fixed top-16 left-0 h-full w-64 bg-white border-r border-gray-300 dark:bg-gray-900 dark:border-gray-700 shadow-lg z-50 transform transition-transform ${isSideMenuOpen ? 'translate-x-0' : '-translate-x-full'} sm:translate-x-0 `}>
-          <div className="p-6 ">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-green-500 dark:to-blue-500">
-                Menu
-              </h2>
-              <button
-                onClick={() => setIsSideMenuOpen(false)}
-                className="text-gray-600 dark:text-gray-300 sm:hidden"
-              >
-                <BsList className="h-6 w-6" />
-              </button>
-            </div>
-            <div className="mt-6 space-y-4">
-              <div className="flex flex-col space-y-2">
-                {(['all', 'saved', 'applied'] as const).map((status) => (
-                  <Button
-                    key={status}
-                    variant={activeTab === status ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setActiveTab(status)}
-                    className={`capitalize ${
-                      activeTab === status
-                        ? 'bg-primary hover:bg-primary/90 dark:bg-blue-600'
-                        : 'hover:bg-gray-300 text-gray-300 hover:text-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-200'
-                    }`}
+        <>
+          <style jsx>{`
+            .modern-scrollbar::-webkit-scrollbar {
+              width: 4px;
+            }
+            .modern-scrollbar::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            .modern-scrollbar::-webkit-scrollbar-thumb {
+              background-color: transparent;
+              border-radius: 20px;
+              transition: background-color 0.3s ease;
+            }
+            .modern-scrollbar:hover::-webkit-scrollbar-thumb {
+              background-color: rgba(156, 163, 175, 0.5);
+            }
+            .modern-scrollbar::-webkit-scrollbar-thumb:hover {
+              background-color: rgba(107, 114, 128, 0.7);
+            }
+            .dark .modern-scrollbar:hover::-webkit-scrollbar-thumb {
+              background-color: rgba(99, 102, 241, 0.5);
+            }
+            .dark .modern-scrollbar::-webkit-scrollbar-thumb:hover {
+              background-color: rgba(99, 102, 241, 0.7);
+            }
+          `}</style>
+          <div className={`fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-white border-r border-gray-300 dark:bg-gray-900 dark:border-gray-700 shadow-lg z-50 transform transition-transform ${isSideMenuOpen ? 'translate-x-0' : '-translate-x-full'} sm:translate-x-0 overflow-hidden`}>
+            <div className="h-full overflow-y-auto modern-scrollbar">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-green-500 dark:to-blue-500">
+                    Menu
+                  </h2>
+                  <button
+                    onClick={() => setIsSideMenuOpen(false)}
+                    className="text-gray-600 dark:text-gray-300 sm:hidden"
                   >
-                    {status}
-                    {activeTab === status && (
-                      <span className="ml-2 bg-white/20 px-1.5 py-0.5 rounded-full text-xs">
-                        {filteredIdeas.length}
-                      </span>
-                    )}
-                  </Button>
-                ))}
-              </div>
-              <div className="relative">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsFilterOpen(!isFilterOpen)}
-                  className="border-gray-300 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
-                >
-                  <BsFilter className="h-5 w-5" />
-                  Filter
-                </Button>
-                {isFilterOpen && (
-                  <div className="absolute left-0 mt-2 w-full bg-white dark:bg-gray-800 border rounded-md shadow-lg py-2 z-50">
-                    <div className="px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-200">Sort By</div>
-                    <div className="px-4 py-2">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="sortOption"
-                          value="newest"
-                          checked={sortOption === 'newest'}
-                          onChange={() => setSortOption('newest')}
-                          className="form-radio"
-                        />
-                        <span className="ml-2 dark:text-gray-200">Newest</span>
-                      </label>
-                      <label className="flex items-center mt-2">
-                        <input
-                          type="radio"
-                          name="sortOption"
-                          value="oldest"
-                          checked={sortOption === 'oldest'}
-                          onChange={() => setSortOption('oldest')}
-                          className="form-radio"
-                        />
-                        <span className="ml-2 dark:text-gray-200">Oldest</span>
-                      </label>
-                    </div>
-                    <div className="px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-200">Equity Range</div>
-                    <div className="px-4 py-2">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="equityRange"
-                          value="all"
-                          checked={equityRange === 'all'}
-                          onChange={() => setEquityRange('all')}
-                          className="form-radio"
-                        />
-                        <span className="ml-2 dark:text-gray-200">All</span>
-                      </label>
-                      <label className="flex items-center mt-2">
-                        <input
-                          type="radio"
-                          name="equityRange"
-                          value="below1"
-                          checked={equityRange === 'below1'}
-                          onChange={() => setEquityRange('below1')}
-                          className="form-radio"
-                        />
-                        <span className="ml-2 dark:text-gray-200">Below 1%</span>
-                      </label>
-                      <label className="flex items-center mt-2">
-                        <input
-                          type="radio"
-                          name="equityRange"
-                          value="1to5"
-                          checked={equityRange === '1to5'}
-                          onChange={() => setEquityRange('1to5')}
-                          className="form-radio"
-                        />
-                        <span className="ml-2 dark:text-gray-200">1-5%</span>
-                      </label>
-                      <label className="flex items-center mt-2">
-                        <input
-                          type="radio"
-                          name="equityRange"
-                          value="5to10"
-                          checked={equityRange === '5to10'}
-                          onChange={() => setEquityRange('5to10')}
-                          className="form-radio"
-                        />
-                        <span className="ml-2 dark:text-gray-200">5-10%</span>
-                      </label>
-                      <label className="flex items-center mt-2">
-                        <input
-                          type="radio"
-                          name="equityRange"
-                          value="above10"
-                          checked={equityRange === 'above10'}
-                          onChange={() => setEquityRange('above10')}
-                          className="form-radio"
-                        />
-                        <span className="ml-2 dark:text-gray-200">Above 10%</span>
-                      </label>
-                    </div>
+                    <BsList className="h-6 w-6" />
+                  </button>
+                </div>
+                <div className="mt-6 space-y-4">
+                  <div className="flex flex-col space-y-2">
+                    {(['all', 'saved', 'applied'] as const).map((status) => (
+                      <Button
+                        key={status}
+                        variant={activeTab === status ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setActiveTab(status)}
+                        className={`capitalize ${
+                          activeTab === status
+                            ? 'bg-primary hover:bg-primary/90 dark:bg-blue-600'
+                            : 'hover:bg-gray-300 text-gray-300 hover:text-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-200'
+                        }`}
+                      >
+                        {status}
+                        {activeTab === status && (
+                          <span className="ml-2 bg-white/20 px-1.5 py-0.5 rounded-full text-xs">
+                            {filteredIdeas.length}
+                          </span>
+                        )}
+                      </Button>
+                    ))}
                   </div>
-                )}
+                  <div className="relative">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsFilterOpen(!isFilterOpen)}
+                      className="border-gray-300 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
+                    >
+                      <BsFilter className="h-5 w-5" />
+                      Filter
+                    </Button>
+                    {isFilterOpen && (
+                      <div className="mt-2 w-full bg-white dark:bg-gray-800 border rounded-md shadow-lg py-2">
+                        <div className="px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-200">Sort By</div>
+                        <div className="px-4 py-2">
+                          <label className="flex items-center">
+                            <input
+                              type="radio"
+                              name="sortOption"
+                              value="newest"
+                              checked={sortOption === 'newest'}
+                              onChange={() => setSortOption('newest')}
+                              className="form-radio"
+                            />
+                            <span className="ml-2 dark:text-gray-200">Newest</span>
+                          </label>
+                          <label className="flex items-center mt-2">
+                            <input
+                              type="radio"
+                              name="sortOption"
+                              value="oldest"
+                              checked={sortOption === 'oldest'}
+                              onChange={() => setSortOption('oldest')}
+                              className="form-radio"
+                            />
+                            <span className="ml-2 dark:text-gray-200">Oldest</span>
+                          </label>
+                        </div>
+                        <div className="px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-200">Equity Range</div>
+                        <div className="px-4 py-2">
+                          <label className="flex items-center">
+                            <input
+                              type="radio"
+                              name="equityRange"
+                              value="all"
+                              checked={equityRange === 'all'}
+                              onChange={() => setEquityRange('all')}
+                              className="form-radio"
+                            />
+                            <span className="ml-2 dark:text-gray-200">All</span>
+                          </label>
+                          <label className="flex items-center mt-2">
+                            <input
+                              type="radio"
+                              name="equityRange"
+                              value="below1"
+                              checked={equityRange === 'below1'}
+                              onChange={() => setEquityRange('below1')}
+                              className="form-radio"
+                            />
+                            <span className="ml-2 dark:text-gray-200">Below 1%</span>
+                          </label>
+                          <label className="flex items-center mt-2">
+                            <input
+                              type="radio"
+                              name="equityRange"
+                              value="1to5"
+                              checked={equityRange === '1to5'}
+                              onChange={() => setEquityRange('1to5')}
+                              className="form-radio"
+                            />
+                            <span className="ml-2 dark:text-gray-200">1-5%</span>
+                          </label>
+                          <label className="flex items-center mt-2">
+                            <input
+                              type="radio"
+                              name="equityRange"
+                              value="5to10"
+                              checked={equityRange === '5to10'}
+                              onChange={() => setEquityRange('5to10')}
+                              className="form-radio"
+                            />
+                            <span className="ml-2 dark:text-gray-200">5-10%</span>
+                          </label>
+                          <label className="flex items-center mt-2">
+                            <input
+                              type="radio"
+                              name="equityRange"
+                              value="above10"
+                              checked={equityRange === 'above10'}
+                              onChange={() => setEquityRange('above10')}
+                              className="form-radio"
+                            />
+                            <span className="ml-2 dark:text-gray-200">Above 10%</span>
+                          </label>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsProfileOpen(true)}
+                    className="border-gray-300 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
+                  >
+                    <img src={profile.photoURL} alt="Profile" className="h-6 w-6 rounded-full" />
+                    Profile
+                  </Button>
+                </div>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsProfileOpen(true)}
-                className="border-gray-300 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
-              >
-                <img src={profile.photoURL} alt="Profile" className="h-6 w-6 rounded-full" />
-                Profile
-              </Button>
             </div>
           </div>
-        </div>
+        </>
       );
     };
+    
+    
+    
 
   return (
     <>
-      <Navbar theme={theme} setIsSideMenuOpen={setIsSideMenuOpen} />
+      <Navbar 
+        theme={theme} 
+        setIsSideMenuOpen={setIsSideMenuOpen} 
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
       <SideNavBar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -494,7 +532,7 @@ const InvestorDashboard = () => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className={`min-h-screen bg-white transition-all duration-300 dark:bg-gradient-to-b dark:from-[#0f0c29] dark:via-[#6b29e4] dark:to-[#24243e] text-black dark:text-white sm:ml-64`}
+        className={`min-h-screen h-[calc(100vh-16rem)] overflow-y-auto modern-scrollbar bg-white transition-all duration-300 dark:bg-gradient-to-b dark:from-[#0f0c29] dark:via-[#6b29e4] dark:to-[#24243e] text-black dark:text-white sm:ml-64`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8 mt-10">
