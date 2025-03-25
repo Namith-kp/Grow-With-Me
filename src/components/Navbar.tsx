@@ -84,7 +84,7 @@ export const Navbar = ({ theme, setIsSideMenuOpen, searchQuery, setSearchQuery }
               <>
                 <Button 
                   onClick={handleSignOut}
-                  className="text-white shadow-lg rounded-full bg-black hover:bg-gray-700 transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 active:shadow-md"
+                  className="text-white shadow-lg rounded-full bg-black hover:bg-gray-700 dark:bg-blue-600 dark:hover:bg-blue-500 transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 active:shadow-md"
                 >
                   Log Out
                 </Button>

@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { BsCurrencyDollar } from "react-icons/bs";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
-import { BsPencil, BsBookmark, BsBookmarkFill,BsPerson, BsSearch, BsFilter, BsList } from "react-icons/bs";
+import { BsGrid, BsPencil, BsBookmark, BsCheckCircle, BsBookmarkFill, BsPerson, BsSearch, BsFilter, BsList } from "react-icons/bs";
 import { useLocation } from "react-router-dom";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { useToast } from "@/components/ui/use-toast";
@@ -85,6 +85,7 @@ const InvestorDashboard = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme());
+  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
 
     const [applicationData, setApplicationData] = useState({
         coverLetter: "",
@@ -104,6 +105,13 @@ const InvestorDashboard = () => {
       const isDarkMode = document.documentElement.classList.contains('dark');
       setTheme(isDarkMode ? 'dark' : 'light');
     }, []);
+
+    const toggleCardExpansion = (ideaId: string) => {
+      setExpandedCards(prev => ({
+        ...prev,
+        [ideaId]: !prev[ideaId]
+      }));
+    };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -381,37 +389,44 @@ const InvestorDashboard = () => {
                 </div>
                 <div className="mt-6 space-y-4">
                   <div className="flex flex-col space-y-2">
-                    {(['all', 'saved', 'applied'] as const).map((status) => (
-                      <Button
-                        key={status}
-                        variant={activeTab === status ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setActiveTab(status)}
-                        className={`capitalize ${
-                          activeTab === status
-                            ? 'bg-primary hover:bg-primary/90 dark:bg-blue-600'
-                            : 'hover:bg-gray-300 text-gray-300 hover:text-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-200'
-                        }`}
-                      >
-                        {status}
-                        {activeTab === status && (
-                          <span className="ml-2 bg-white/20 px-1.5 py-0.5 rounded-full text-xs">
-                            {filteredIdeas.length}
-                          </span>
-                        )}
-                      </Button>
+                  {([
+                    { id: 'all', icon: <BsGrid className="h-4 w-4 mr-2" /> },
+                    { id: 'saved', icon: <BsBookmarkFill className="h-4 w-4 mr-2" /> },
+                    { id: 'applied', icon: <BsCheckCircle className="h-4 w-4 mr-2" /> }
+                  ] as const).map((item) => (        
+                    <Button
+                      key={item.id}
+                      variant={activeTab === item.id ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setActiveTab(item.id)}
+                      className={`flex items-center justify-start px-3 py-2 capitalize transition-all duration-300 ${
+                        activeTab === item.id
+                          ? 'bg-primary hover:bg-primary/90 dark:bg-blue-600 shadow-md'
+                          : 'hover:bg-gray-100 text-gray-700 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200'
+                      }`}
+                    >
+                      <div className="flex items-center">
+                        {item.icon}
+                        <span>{item.id}</span>
+                      </div>
+                      {activeTab === item.id && (
+                        <span className="ml-auto bg-white/20 px-1.5 py-0.5 rounded-full text-xs">
+                          {filteredIdeas.length}
+                        </span>
+                      )}
+                    </Button>
                     ))}
                   </div>
                   <div className="relative">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setIsFilterOpen(!isFilterOpen)}
-                      className="border-gray-300 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
-                    >
-                      <BsFilter className="h-5 w-5" />
-                      Filter
-                    </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsFilterOpen(!isFilterOpen)}
+                    className="flex items-center justify-start w-full px-3 py-2 border-gray-300 dark:border-blue-400 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 transition-all duration-300"
+                  >
+                    <BsFilter className="h-4 w-4 mr-2" />
+                    <span>Filter</span>
+                  </Button>
                     {isFilterOpen && (
                       <div className="mt-2 w-full bg-white dark:bg-gray-800 border rounded-md shadow-lg py-2">
                         <div className="px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-200">Sort By</div>
@@ -501,14 +516,16 @@ const InvestorDashboard = () => {
                     )}
                   </div>
                   <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsProfileOpen(true)}
-                    className="border-gray-300 flex items-center space-x-1 dark:border-blue-400 dark:bg-gradient-to-r dark:from-green-700 dark:to-blue-800 dark:text-white dark:hover:bg-gradient-to-r dark:hover:from-blue-800 dark:hover:to-green-700"
-                  >
-                    <img src={profile.photoURL} alt="Profile" className="h-6 w-6 rounded-full" />
-                    Profile
-                  </Button>
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsProfileOpen(true)}
+                      className="flex items-center justify-start w-full px-3 py-2 border-gray-300 dark:border-blue-400 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 transition-all duration-300"
+                    >
+                      <div className="flex items-center">
+                        <img src={profile.photoURL} alt="Profile" className="h-5 w-5 rounded-full mr-2" />
+                        <span>Profile</span>
+                      </div>
+                    </Button>
                 </div>
               </div>
             </div>
@@ -608,88 +625,149 @@ const InvestorDashboard = () => {
                     <div className="space-y-4">
                       {filteredIdeas.map((idea) => (
                         <motion.div
-                          key={idea.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="bg-white p-6 rounded-lg shadow-xl border border-gray-100 hover:border-primary/50 transition-all duration-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-blue-500"
-                        >
-                          <div className="flex flex-col space-y-4">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{idea.cofounderRole}</h3>
-                                <p className="text-gray-600 mt-1 dark:text-gray-300">{idea.companyName}</p>
-                              </div>
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => toggleSaveIdea(idea.id)}
-                                className="duration-300 hover:bg-gray-300"
-                              >
-                                {savedIdeas.includes(idea.id) ? (
-                                  <BsBookmarkFill className="h-5 w-5 text-primary  dark:text-blue-400" />
-                                ) : (
-                                  <BsBookmark className="h-5 w-5 " />
+                        key={idea.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-white p-3 rounded-lg shadow-xl border border-gray-100 hover:border-primary/50 transition-all duration-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-blue-500"
+                        layout // Add this to make motion handle the layout changes
+                      >
+                        <div className="flex flex-col space-y-4">
+                          {/* First part of the card - heading and bookmark */}
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{idea.cofounderRole}</h3>
+                              <p className="text-gray-600 mt-1 dark:text-gray-300">{idea.companyName}</p>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => toggleSaveIdea(idea.id)}
+                              className="duration-300 hover:bg-gray-300"
+                            >
+                              {savedIdeas.includes(idea.id) ? (
+                                <BsBookmarkFill className="h-5 w-5 text-primary dark:text-blue-400" />
+                              ) : (
+                                <BsBookmark className="h-5 w-5" />
+                              )}
+                            </Button>
+                          </div>
+                      
+                          {/* Details section */}
+                          <div className="flex flex-wrap gap-3 text-sm text-gray-600 dark:text-gray-200">
+                            <span>{idea.experienceRequired} years exp</span>
+                            <span>•</span>
+                            <span>{idea.fundingStage}</span>
+                            {idea.salaryRange && (
+                              <>
+                                <span>•</span>
+                                <span>${idea.salaryRange}k</span>
+                              </>
+                            )}
+                            {idea.equityRange && (
+                              <>
+                                <span>•</span>
+                                <span>{idea.equityRange}% equity</span>
+                              </>
+                            )}
+                          </div>
+                      
+                          {/* Tech stack */}
+                          <div className="flex flex-wrap gap-2">
+                            {renderinvestmentInterests(idea.techStack)}
+                          </div>
+                      
+                          {/* Idea description with animation */}
+                          <div className="my-2">
+                            <h4 className="font-semibold text-gray-900 mb-2 dark:text-gray-100">Idea Description</h4>
+                            <motion.div
+                              initial={false}
+                              animate={{ height: expandedCards[idea.id] ? "auto" : "50px" }}
+                              className="relative overflow-hidden"
+                              transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                            >
+                              <div className="text-gray-600 dark:text-gray-400 whitespace-pre-line break-words">
+                                {idea.ideaDescription}
+                                
+                                {/* Gradient overlay when collapsed */}
+                                {!expandedCards[idea.id] && idea.ideaDescription.length > 50 && (
+                                  <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white dark:from-gray-800 to-transparent pointer-events-none" />
                                 )}
+                              </div>
+                            </motion.div>
+                            
+                            {idea.ideaDescription.length > 50 && (
+                              <Button
+                                variant="link"
+                                className="text-primary dark:text-blue-400 p-0 h-auto mt-1 flex items-center gap-1 transition-transform duration-300"
+                                onClick={() => toggleCardExpansion(idea.id)}
+                              >
+                                <span>{expandedCards[idea.id] ? "See less" : "See more"}</span>
+                                <motion.span 
+                                  animate={{ rotate: expandedCards[idea.id] ? 180 : 0 }}
+                                  transition={{ duration: 0.3 }}
+                                >
+                                  {expandedCards[idea.id] ? "↑" : "↓"}
+                                </motion.span>
+                              </Button>
+                            )}
+                          </div>
+                      
+                          {/* Role description with animation */}
+                          {idea.roleDescription && (
+                            <div className="my-2">
+                              <h4 className="font-semibold text-gray-900 mb-2 dark:text-gray-100">Role Description</h4>
+                              <motion.div
+                                initial={false}
+                                animate={{ height: expandedCards[idea.id] ? "auto" : "50px" }}
+                                className="relative overflow-hidden"
+                                transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                              >
+                                <div className="text-gray-600 dark:text-gray-400 whitespace-pre-line break-words">
+                                  {idea.roleDescription}
+                                  
+                                  {/* Gradient overlay when collapsed */}
+                                  {!expandedCards[idea.id] && idea.roleDescription.length > 50 && (
+                                    <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white dark:from-gray-800 to-transparent pointer-events-none" />
+                                  )}
+                                </div>
+                              </motion.div>
+                              
+                              {idea.roleDescription.length > 50 && !expandedCards[idea.id] && (
+                                <Button
+                                  variant="link"
+                                  className="text-primary dark:text-blue-400 p-0 h-auto mt-1 flex items-center gap-1"
+                                  onClick={() => toggleCardExpansion(idea.id)}
+                                >
+                                  <span>See more</span>
+                                  <span>↓</span>
+                                </Button>
+                              )}
+                            </div>
+                          )}
+                      
+                          {/* Footer */}
+                          <div className="flex justify-between items-center pt-4">
+                            <div className="flex items-center space-x-2">
+                              <img
+                                src={idea.photoURL}
+                                alt="Recruiter"
+                                className="w-8 h-8 rounded-full"
+                              />
+                              <span className="text-sm text-gray-500 dark:text-gray-300">
+                                Posted by {idea.email}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-start">
+                              <Button 
+                                className="bg-primary hover:bg-primary/90 dark:bg-gradient-to-r dark:from-blue-500 dark:to-blue-700 dark:hover:bg-gradient-to-r dark:hover:from-blue-700 dark:hover:to-blue-500"
+                                onClick={() => setSelectedIdea(idea)}
+                              >
+                                {activeTab === 'applied' ? 'Re-Apply Now' : 'Apply Now'}
                               </Button>
                             </div>
-    
-                            <div className="flex flex-wrap gap-3 text-sm text-gray-600 dark:text-gray-200">
-                              <span>{idea.experienceRequired} years exp</span>
-                              <span>•</span>
-                              <span>{idea.fundingStage}</span>
-                              {idea.salaryRange && (
-                                <>
-                                  <span>•</span>
-                                  <span>${idea.salaryRange}k</span>
-                                </>
-                              )}
-                              {idea.equityRange && (
-                                <>
-                                  <span>•</span>
-                                  <span>{idea.equityRange}% equity</span>
-                                </>
-                              )}
-                            </div>
-    
-                            <div className="flex flex-wrap gap-2 ">
-                              {renderinvestmentInterests(idea.techStack)}
-                            </div>
-    
-                            <div>
-                              <h4 className="font-semibold text-gray-900 mb-2 dark:text-gray-100">Idea Description</h4>
-                              <p className="text-gray-600 dark:text-gray-400">{idea.ideaDescription}</p>
-                            </div>
-    
-                            {idea.roleDescription && (
-                              <div>
-                                <h4 className="font-semibold text-gray-900 mb-2 dark:text-gray-100">Role Description</h4>
-                                <p className="text-gray-600 dark:text-gray-400">{idea.roleDescription}</p>
-                              </div>
-                            )}
-    
-                            <div className="flex justify-between items-center pt-4">
-                              <div className="flex items-center space-x-2">
-                                <img
-                                  src={idea.photoURL}
-                                  alt="Recruiter"
-                                  className="w-8 h-8 rounded-full"
-                                />
-                                <span className="text-sm text-gray-500 dark:text-gray-300">
-                                  Posted by {idea.email}
-                                </span>
-                              </div>
-                              <div className="flex justify-between items-start">
-                                <Button 
-                                  className="bg-primary hover:bg-primary/90 dark:bg-gradient-to-r dark:from-blue-500 dark:to-blue-700 dark:hover:bg-gradient-to-r dark:hover:from-blue-700 dark:hover:to-blue-500"
-                                  onClick={() => setSelectedIdea(idea)}
-                                >
-                                  {activeTab === 'applied' ? 'Re-Apply Now' : 'Apply Now'}
-                                  
-                                </Button>
-                              </div>
-                            </div>
                           </div>
-                        </motion.div>
+                        </div>
+                      </motion.div>
                       ))}
                       {filteredIdeas.length === 0 && (
                         <motion.div
