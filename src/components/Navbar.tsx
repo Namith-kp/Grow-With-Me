@@ -55,7 +55,7 @@ export const Navbar = ({ theme, setIsSideMenuOpen, searchQuery, setSearchQuery }
             </button>
             <Link 
               to="/" 
-              className="text-lg sm:text-xl md:text-2xl font-extrabold text-primary dark:text-dark-foreground tracking-tight hover:opacity-80 transition-opacity truncate"
+              className="text-lg sm:text-2xl md:text-2xl lg:text-4xl font-extrabold text-primary dark:text-dark-foreground tracking-tight hover:opacity-80 transition-opacity truncate"
               >
               <span className="xs:inline">Grow With Me</span>
               

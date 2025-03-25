@@ -85,7 +85,7 @@ const InvestorDashboard = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme());
-  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
+  const [expandedCards, setExpandedCards] = useState<Record<string, { description: boolean, role: boolean }>>({});
 
     const [applicationData, setApplicationData] = useState({
         coverLetter: "",
@@ -106,10 +106,23 @@ const InvestorDashboard = () => {
       setTheme(isDarkMode ? 'dark' : 'light');
     }, []);
 
-    const toggleCardExpansion = (ideaId: string) => {
+    const toggleDescriptionExpansion = (ideaId: string) => {
       setExpandedCards(prev => ({
         ...prev,
-        [ideaId]: !prev[ideaId]
+        [ideaId]: {
+          description: !(prev[ideaId]?.description ?? false),
+          role: prev[ideaId]?.role ?? false
+        }
+      }));
+    };
+    
+    const toggleRoleExpansion = (ideaId: string) => {
+      setExpandedCards(prev => ({
+        ...prev,
+        [ideaId]: {
+          description: prev[ideaId]?.description ?? false,
+          role: !(prev[ideaId]?.role ?? false)
+        }
       }));
     };
 
@@ -519,7 +532,7 @@ const InvestorDashboard = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => setIsProfileOpen(true)}
-                      className="flex items-center justify-start w-full px-3 py-2 border-gray-300 dark:border-blue-400 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 transition-all duration-300"
+                      className="hidden sm:hidden md:flex lg:flex items-center justify-start w-full px-3 py-2 border-gray-300 dark:border-blue-400 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 transition-all duration-300"
                     >
                       <div className="flex items-center">
                         <img src={profile.photoURL} alt="Profile" className="h-5 w-5 rounded-full mr-2" />
@@ -572,7 +585,7 @@ const InvestorDashboard = () => {
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-red-300 dark:to-blue-500">
               Investor Dashboard
             </h1>
-            <div className="hidden sm:flex md:flex lg:hidden flex-col sm:flex-row items-center gap-4 mt-4 sm:mt-0 w-full sm:w-auto">
+            <div className=" hidden flex-col sm:flex-row items-center gap-4 mt-4 sm:mt-0 w-full sm:w-auto">
             <div className="relative w-full sm:w-auto flex-grow">
                 <input
                   type="text"
@@ -621,7 +634,7 @@ const InvestorDashboard = () => {
                       </div>
                     </div>
                 </CardHeader>
-                  <CardContent className="p-6 ">
+                  <CardContent className="p-5 ">
                     <div className="space-y-4">
                       {filteredIdeas.map((idea) => (
                         <motion.div
@@ -681,7 +694,7 @@ const InvestorDashboard = () => {
                             <h4 className="font-semibold text-gray-900 mb-2 dark:text-gray-100">Idea Description</h4>
                             <motion.div
                               initial={false}
-                              animate={{ height: expandedCards[idea.id] ? "auto" : "50px" }}
+                              animate={{ height: expandedCards[idea.id]?.description ? "auto" : "50px" }}
                               className="relative overflow-hidden"
                               transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
                             >
@@ -689,36 +702,36 @@ const InvestorDashboard = () => {
                                 {idea.ideaDescription}
                                 
                                 {/* Gradient overlay when collapsed */}
-                                {!expandedCards[idea.id] && idea.ideaDescription.length > 50 && (
+                                {!(expandedCards[idea.id]?.description) && idea.ideaDescription.length > 150 && (
                                   <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white dark:from-gray-800 to-transparent pointer-events-none" />
                                 )}
                               </div>
                             </motion.div>
                             
-                            {idea.ideaDescription.length > 50 && (
+                            {idea.ideaDescription.length > 150 && (
                               <Button
                                 variant="link"
                                 className="text-primary dark:text-blue-400 p-0 h-auto mt-1 flex items-center gap-1 transition-transform duration-300"
-                                onClick={() => toggleCardExpansion(idea.id)}
+                                onClick={() => toggleDescriptionExpansion(idea.id)}
                               >
-                                <span>{expandedCards[idea.id] ? "See less" : "See more"}</span>
+                                <span>{expandedCards[idea.id]?.description ? "See less" : "See more"}</span>
                                 <motion.span 
-                                  animate={{ rotate: expandedCards[idea.id] ? 180 : 0 }}
+                                  animate={{ rotate: expandedCards[idea.id]?.description ? 180 : 0 }}
                                   transition={{ duration: 0.3 }}
                                 >
-                                  {expandedCards[idea.id] ? "↑" : "↓"}
+                                  {expandedCards[idea.id]?.description ? "↑" : "↓"}
                                 </motion.span>
                               </Button>
                             )}
                           </div>
-                      
+
                           {/* Role description with animation */}
                           {idea.roleDescription && (
                             <div className="my-2">
                               <h4 className="font-semibold text-gray-900 mb-2 dark:text-gray-100">Role Description</h4>
                               <motion.div
                                 initial={false}
-                                animate={{ height: expandedCards[idea.id] ? "auto" : "50px" }}
+                                animate={{ height: expandedCards[idea.id]?.role ? "auto" : "50px" }}
                                 className="relative overflow-hidden"
                                 transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
                               >
@@ -726,20 +739,25 @@ const InvestorDashboard = () => {
                                   {idea.roleDescription}
                                   
                                   {/* Gradient overlay when collapsed */}
-                                  {!expandedCards[idea.id] && idea.roleDescription.length > 50 && (
+                                  {!(expandedCards[idea.id]?.role) && idea.roleDescription.length > 150 && (
                                     <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white dark:from-gray-800 to-transparent pointer-events-none" />
                                   )}
                                 </div>
                               </motion.div>
                               
-                              {idea.roleDescription.length > 50 && !expandedCards[idea.id] && (
+                              {idea.roleDescription.length > 150 && (
                                 <Button
                                   variant="link"
                                   className="text-primary dark:text-blue-400 p-0 h-auto mt-1 flex items-center gap-1"
-                                  onClick={() => toggleCardExpansion(idea.id)}
+                                  onClick={() => toggleRoleExpansion(idea.id)}
                                 >
-                                  <span>See more</span>
-                                  <span>↓</span>
+                                  <span>{expandedCards[idea.id]?.role ? "See more" : "See less"}</span>
+                                  <motion.span 
+                                    animate={{ rotate: expandedCards[idea.id]?.role ? 180 : 0 }}
+                                    transition={{ duration: 0.3 }}
+                                  >
+                                    {expandedCards[idea.id]?.role ? "↑" : "↓"}
+                                  </motion.span>
                                 </Button>
                               )}
                             </div>
