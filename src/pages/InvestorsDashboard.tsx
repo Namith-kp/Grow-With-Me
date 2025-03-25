@@ -14,6 +14,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { getFirestore, doc, getDoc, collection, query, getDocs, updateDoc } from 'firebase/firestore';
 import { getInvestmentOpportunities, getPortfolioPerformance, submitInvestmentInterest, getActiveJobs } from "@/lib/investor";
 import './InvestorsDashboard.css';
+import { getInitialTheme, toggleTheme as toggleThemeUtil } from '@/components/theme';
+
 
 interface InvestorProfile {
   firstName: string;
@@ -82,12 +84,26 @@ const InvestorDashboard = () => {
   const [equityRange, setEquityRange] = useState<'all'|'below1' | '1to5' | '5to10' |'above10'>('all');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
-  const [theme, setTheme] = useState('light'); // Add theme state
+  const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme());
 
     const [applicationData, setApplicationData] = useState({
         coverLetter: "",
         whatsappNumber: ""
     });
+
+    // Replace the toggleTheme function with this in InvestorDashboard.tsx:
+    const toggleTheme = () => {
+      const newTheme = toggleThemeUtil();
+      setTheme(newTheme);
+    };
+
+    // Replace your useEffect with:
+    useEffect(() => {
+      // This effect runs once on component mount
+      // Check the actual DOM state, which was set by the IIFE in theme.ts
+      const isDarkMode = document.documentElement.classList.contains('dark');
+      setTheme(isDarkMode ? 'dark' : 'light');
+    }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -192,9 +208,9 @@ const InvestorDashboard = () => {
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4 mt-10 dark:bg-gradient-to-b dark:from-[#0f0c29] dark:via-[#6b29e4] dark:to-[#24243e] text-black dark:text-white">
           <div className="max-w-7xl mx-auto">
             <div className="animate-pulse space-y-4">
-              <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-              <div className="h-32 bg-gray-200 rounded"></div>
-              <div className="h-64 bg-gray-200 rounded"></div>
+              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+              <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded"></div>
             </div>
           </div>
         </div>
@@ -349,7 +365,7 @@ const InvestorDashboard = () => {
               background-color: rgba(99, 102, 241, 0.7);
             }
           `}</style>
-          <div className={`fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-white border-r border-gray-300 dark:bg-gray-900 dark:border-gray-700 shadow-lg z-50 transform transition-transform ${isSideMenuOpen ? 'translate-x-0' : '-translate-x-full'} sm:translate-x-0 overflow-hidden`}>
+          <div className={`fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-white border border-gray-300 dark:bg-gray-900 dark:border-gray-700 shadow-lg z-50 transform transition-transform ${isSideMenuOpen ? 'translate-x-0' : '-translate-x-full'} sm:translate-x-0 overflow-hidden`}>
             <div className="h-full overflow-y-auto modern-scrollbar">
               <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
@@ -532,15 +548,15 @@ const InvestorDashboard = () => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className={`min-h-screen h-[calc(100vh-16rem)] overflow-y-auto modern-scrollbar bg-white transition-all duration-300 dark:bg-gradient-to-b dark:from-[#0f0c29] dark:via-[#6b29e4] dark:to-[#24243e] text-black dark:text-white sm:ml-64`}
+        className={`min-h-screen h-[calc(100vh-16rem)] overflow-y-auto modern-scrollbar bg-white transition-all duration-300 dark:bg-gray-900 text-black dark:text-white sm:ml-64`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8 mt-10">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-red-300 dark:to-blue-500">
               Investor Dashboard
             </h1>
-            <div className="hidden sm:flex flex-col sm:flex-row items-center gap-4 mt-4 sm:mt-0 w-full sm:w-auto">
-              <div className="relative w-full sm:w-auto flex-grow">
+            <div className="hidden sm:flex md:flex lg:hidden flex-col sm:flex-row items-center gap-4 mt-4 sm:mt-0 w-full sm:w-auto">
+            <div className="relative w-full sm:w-auto flex-grow">
                 <input
                   type="text"
                   placeholder="Search..."
@@ -558,7 +574,7 @@ const InvestorDashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 ">
             {/* Investment Opportunities Section */}
             <div className="lg:col-span-3 space-y-6">
-              <Card className="lg:col-span-1 border-none shadow-xl bg-gray-100 duration-300 dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800 dark:border-2 dark:border-blue-400 dark:shadow-blue-500/80">
+              <Card className="lg:col-span-1 border-none shadow-xl bg-gray-100 duration-300 dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800 dark:border-b dark:border-blue-400 dark:shadow-blue-500/80">
                 <CardHeader className="border-b border-gray-100 dark:border-gray-700">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent transition-all duration-300 dark:from-green-500 dark:to-blue-500">
@@ -607,10 +623,10 @@ const InvestorDashboard = () => {
                                 variant="outline"
                                 size="icon"
                                 onClick={() => toggleSaveIdea(idea.id)}
-                                className="duration-300"
+                                className="duration-300 hover:bg-gray-300"
                               >
                                 {savedIdeas.includes(idea.id) ? (
-                                  <BsBookmarkFill className="h-5 w-5 text-primary dark:text-blue-400" />
+                                  <BsBookmarkFill className="h-5 w-5 text-primary  dark:text-blue-400" />
                                 ) : (
                                   <BsBookmark className="h-5 w-5 " />
                                 )}
@@ -808,9 +824,7 @@ const InvestorDashboard = () => {
             <Button
                 variant="outline"
                 size="icon"
-                className="border flex items-center space-x-1 dark:border-blue-400 dark:text-white"
-
-                            
+                className="border flex items-center space-x-1 dark:border-blue-400 dark:text-white"           
                 onClick={() => {
                 setEditedProfile(profile);
                 setIsEditing(true);
@@ -852,6 +866,35 @@ const InvestorDashboard = () => {
                 </div>
               </div>
             </div>
+
+            {/* NEW: Appearance Section */}
+            <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50/80 dark:bg-gray-700">
+              <div className="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dark:text-white">
+                  <circle cx="12" cy="12" r="4"></circle>
+                  <path d="M12 2v2"></path>
+                  <path d="M12 20v2"></path>
+                  <path d="M4.93 4.93l1.41 1.41"></path>
+                  <path d="M17.66 17.66l1.41 1.41"></path>
+                  <path d="M2 12h2"></path>
+                  <path d="M20 12h2"></path>
+                  <path d="M6.34 17.66l-1.41 1.41"></path>
+                  <path d="M19.07 4.93l-1.41 1.41"></path>
+                </svg>
+                <span className="font-semibold text-gray-900 dark:text-gray-200">Appearance</span>
+              </div>
+              <div 
+                onClick={toggleTheme}
+                className="w-12 h-6 flex items-center bg-gray-300 dark:bg-gray-600 rounded-full px-1 cursor-pointer relative"
+              >
+                <div className="absolute left-1 right-0 flex justify-between items-center px-1 text-xs">
+                  <span className="text-yellow-500">☀️</span>
+                  <span className="text-indigo-300">🌙</span>
+                </div>
+                <div className={`bg-white dark:bg-indigo-500 w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${theme === 'dark' ? 'translate-x-6' : ''}`}></div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>

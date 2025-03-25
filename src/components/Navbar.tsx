@@ -73,7 +73,7 @@ export const Navbar = ({ theme, setIsSideMenuOpen, searchQuery, setSearchQuery }
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full p-2 pl-10 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-blue-400 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                 />
-                <BsSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <BsSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-200" />
               </div>
             )}
           </div>
@@ -84,16 +84,11 @@ export const Navbar = ({ theme, setIsSideMenuOpen, searchQuery, setSearchQuery }
               <>
                 <Button 
                   onClick={handleSignOut}
-                  className="text-white shadow-lg bg-gradient-to-r from-primary to-blue-400 hover:from-primary/90 hover:to-blue-500 transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 active:shadow-md"
+                  className="text-white shadow-lg rounded-full bg-black hover:bg-gray-700 transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 active:shadow-md"
                 >
                   Log Out
                 </Button>
-                <button
-                  onClick={toggleTheme}
-                  className="px-4 py-2 rounded-md bg-primary dark:bg-dark-primary text-foreground dark:text-dark-foreground hover:bg-secondary dark:hover:bg-dark-secondary transition-all"
-                >
-                  {theme === 'light' ? '🌙' : '☀️'}
-                </button>
+                
               </>
             ) : isHomePage && (
               <div className="relative" ref={dropdownRef}>
