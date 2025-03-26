@@ -10,7 +10,7 @@ import { BsList,  BsSearch } from "react-icons/bs";
 //   toggleTheme: () => void;
 // }
 
-export const Navbar = ({ theme, setIsSideMenuOpen, searchQuery, setSearchQuery }) => {
+export const Navbar = ({ theme, setIsSideMenuOpen, searchQuery, setSearchQuery, profileElement }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -43,7 +43,7 @@ export const Navbar = ({ theme, setIsSideMenuOpen, searchQuery, setSearchQuery }
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-1">
         <div className="flex justify-between h-16 items-center">
           {/* Left section - Logo and menu button */}
           <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0 min-w-0">
@@ -55,7 +55,7 @@ export const Navbar = ({ theme, setIsSideMenuOpen, searchQuery, setSearchQuery }
             </button>
             <Link 
               to="/" 
-              className="text-lg sm:text-2xl md:text-2xl lg:text-4xl font-extrabold text-primary dark:text-dark-foreground tracking-tight hover:opacity-80 transition-opacity truncate"
+              className="text-lg sm:text-2xl md:text-2xl lg:text-3xl font-extrabold text-primary dark:text-dark-foreground tracking-tight hover:opacity-80 transition-opacity truncate"
               >
               <span className="xs:inline">Grow With Me</span>
               
@@ -88,6 +88,7 @@ export const Navbar = ({ theme, setIsSideMenuOpen, searchQuery, setSearchQuery }
                 >
                   Log Out
                 </Button>
+                {profileElement}
                 
               </>
             ) : isHomePage && (

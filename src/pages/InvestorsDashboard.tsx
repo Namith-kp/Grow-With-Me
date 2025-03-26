@@ -528,17 +528,7 @@ const InvestorDashboard = () => {
                       </div>
                     )}
                   </div>
-                  <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setIsProfileOpen(true)}
-                      className="hidden sm:hidden md:flex lg:flex items-center justify-start w-full px-3 py-2 border-gray-300 dark:border-blue-400 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 transition-all duration-300"
-                    >
-                      <div className="flex items-center">
-                        <img src={profile.photoURL} alt="Profile" className="h-5 w-5 rounded-full mr-2" />
-                        <span>Profile</span>
-                      </div>
-                    </Button>
+                  
                 </div>
               </div>
             </div>
@@ -557,6 +547,18 @@ const InvestorDashboard = () => {
         setIsSideMenuOpen={setIsSideMenuOpen} 
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        profileElement={
+          <button
+            onClick={() => setIsProfileOpen(true)}
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200 ml-2"
+          >
+            <img 
+              src={profile?.photoURL} 
+              alt="Profile" 
+              className="h-10 w-10 rounded-full border-2 border-gray-300 dark:border-blue-400" 
+            />
+          </button>
+        }
       />
       <SideNavBar
         activeTab={activeTab}
@@ -1096,6 +1098,8 @@ const InvestorDashboard = () => {
                 variant="outline"
                 onClick={() => handleSubmitApplication(selectedIdea.id)}
                 disabled={isSubmitting || !applicationData.coverLetter  || !applicationData.whatsappNumber}
+                className="bg-primary hover:bg-primary/90 text-gray-200 dark:bg-gradient-to-r dark:from-blue-500 dark:to-blue-700 dark:hover:bg-gradient-to-r dark:hover:from-blue-700 dark:hover:to-blue-500"
+
               >
                 {isSubmitting ? 'Submitting...' : 'Submit Application'}
               </Button>
