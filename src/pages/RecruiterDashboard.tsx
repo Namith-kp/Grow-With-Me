@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { BsBuilding, BsCurrencyDollar, BsPencil, BsBriefcase,  BsSearch } from "react-icons/bs";
+import { BsBuilding, BsCurrencyDollar, BsPencil, BsBriefcase,  BsSearch,  BsFilter, BsList, BsGrid, BsPerson } from "react-icons/bs";
 import { HiOutlineDocumentText, HiOutlineUsers } from "react-icons/hi";
 import { FaWhatsapp } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { useLocation } from "react-router-dom";
+import { getInitialTheme, toggleTheme as toggleThemeUtil } from '@/components/theme';
 import { 
   getFirestore, 
   doc, 
@@ -88,7 +89,7 @@ interface IdeaPost extends RecruiterProfile {
 export const RecruiterDashboard = () => {
   const location = useLocation();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<'pending' | 'reviewing' | 'accepted' | 'rejected'>('pending');
+  const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'reviewing' | 'accepted' | 'rejected'>('all');
   const [profile, setProfile] = useState<RecruiterProfile | null>(null);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
@@ -107,16 +108,52 @@ export const RecruiterDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredDeveloperCandidates, setFilteredDevelopers] = useState<Candidate[]>([]);
   const [filteredInvestorApplications, setFilteredInvestors] = useState<InvestorApplication[]>([]);
+  const [sortOption, setSortOption] = useState<'newest' | 'oldest'>('newest');
+  const [experienceFilter, setExperienceFilter] = useState<'all' | '0-1' | '1-3' | '3-5' | '5+'>('all');
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme());
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [netWorthFilter, setNetWorthFilter] = useState<'all' | 'under100k' | '100k-500k' | '500k-1m' | 'over1m'>('all');
+  const [selectedInvestmentInterests, setSelectedInvestmentInterests] = useState<string[]>([]);
 
+
+  
   const handleViewCandidate = (candidate: Candidate) => {
     setSelectedCandidate(candidate);
     setShowCandidateDetails(true);
   };
 
+  const availableSkills = [
+    'Python', 'Java', 'JavaScript', 'Kotlin', 'Swift', 'C', 'C++', 'C#', 
+    'React', 'Angular', 'Vue', 'Node.js', 'Django', 'Flask', 'Spring'
+  ];
+
+  const availableInvestmentInterests = [
+    'SaaS', 'FinTech', 'Healthcare', 'EdTech', 'E-commerce', 
+    'AI/ML', 'Blockchain', 'IoT', 'CleanTech', 'B2B', 'B2C', 'Mobile Apps'
+  ];
+
   const handleViewInvestorApplication = (application: InvestorApplication) => {
     setSelectedInvestorApplication(application);
     setShowInvestorApplicationDetails(true);
   };
+
+  const toggleTheme = () => {
+    const newTheme = toggleThemeUtil();
+    setTheme(newTheme);
+  };
+
+  // Replace your useEffect with:
+  useEffect(() => {
+    // This effect runs once on component mount
+    // Check the actual DOM state, which was set by the IIFE in theme.ts
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    setTheme(isDarkMode ? 'dark' : 'light');
+  }, []);
+
+  
 
   const handleUpdateApplicationStatus = async (candidateId: string, newStatus: 'accepted' | 'rejected') => {
     try {
@@ -196,6 +233,7 @@ export const RecruiterDashboard = () => {
             description: "User ID not found. Please try logging in again.",
             variant: "destructive"
           });
+          setLoading(false); // Important to set loading to false even on error
           return;
         }
 
@@ -313,21 +351,35 @@ export const RecruiterDashboard = () => {
     fetchData();
   }, [location.state?.uid, toast]);
 
+  // Add this useEffect to handle both search query and tab filtering
   useEffect(() => {
-    const lowercasedQuery = searchQuery.toLowerCase();
-    setFilteredDevelopers(
-      developerCandidates.filter(candidate =>
-        candidate.name.toLowerCase().includes(lowercasedQuery) ||
-        candidate.skills.some(skill => skill.toLowerCase().includes(lowercasedQuery))
-      )
+    // First filter by search query
+    const searchFiltered = developerCandidates.filter(candidate =>
+      searchQuery === '' || 
+      candidate.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      candidate.skills.some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase()))
     );
-    setFilteredInvestors(
-      investorApplications.filter(application =>
-        application.name.toLowerCase().includes(lowercasedQuery) ||
-        application.investmentInterests.toLowerCase().includes(lowercasedQuery)
-      )
+    
+    // Then filter by active tab (status), showing all if activeTab is 'all'
+    const statusFiltered = activeTab === 'all' 
+      ? searchFiltered 
+      : searchFiltered.filter(candidate => candidate.status === activeTab);
+    
+    setFilteredDevelopers(statusFiltered);
+    
+    // Same for investor applications
+    const searchFilteredInvestors = investorApplications.filter(application =>
+      searchQuery === '' || 
+      application.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      application.investmentInterests.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [searchQuery, developerCandidates, investorApplications]);
+    
+    const statusFilteredInvestors = activeTab === 'all'
+      ? searchFilteredInvestors
+      : searchFilteredInvestors.filter(application => application.status === activeTab);
+    
+    setFilteredInvestors(statusFilteredInvestors);
+  }, [searchQuery, developerCandidates, investorApplications, activeTab]); // Include activeTab in dependencies
 
   const handleProfileUpdate = async () => {
     if (!editedProfile || !location.state?.uid) return;
@@ -352,6 +404,161 @@ export const RecruiterDashboard = () => {
       });
     }
   };
+
+  // Add this effect to apply the filters
+useEffect(() => {
+  // Filter developers by search query, experience and skills
+  const filteredCandidates = developerCandidates.filter(candidate => {
+    // Filter by status
+    if (activeTab !== 'all' && candidate.status !== activeTab) return false;
+    
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      if (!candidate.name.toLowerCase().includes(query) && 
+          !candidate.skills.some(skill => skill.toLowerCase().includes(query))) {
+        return false;
+      }
+    }
+    
+    // Filter by experience
+    if (experienceFilter !== 'all') {
+      const exp = parseInt(candidate.experience);
+      if (experienceFilter === '0-1' && (exp < 0 || exp > 1)) return false;
+      if (experienceFilter === '1-3' && (exp < 1 || exp > 3)) return false;
+      if (experienceFilter === '3-5' && (exp < 3 || exp > 5)) return false;
+      if (experienceFilter === '5+' && exp < 5) return false;
+    }
+    
+    // Filter by skills
+    if (selectedSkills.length > 0) {
+      if (!selectedSkills.some(skill => candidate.skills.includes(skill))) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
+  
+  // Sort by date
+  const sortedCandidates = [...filteredCandidates].sort((a, b) => {
+    const dateA = new Date(a.appliedDate);
+    const dateB = new Date(b.appliedDate);
+    return sortOption === 'newest' ? dateB.getTime() - dateA.getTime() : dateA.getTime() - dateB.getTime();
+  });
+  
+  setFilteredDevelopers(sortedCandidates);
+  
+  // Similar for investors
+  // ...
+}, [
+  developerCandidates, 
+  activeTab, 
+  searchQuery, 
+  experienceFilter, 
+  selectedSkills, 
+  sortOption
+]);
+
+// Add this effect to filter investor applications
+// Update the investor filtering function with this improved net worth filter
+useEffect(() => {
+  // Only run this if we're on the investors tab
+  if (activeApplicationTab !== 'investors') return;
+  
+  const filteredInvestors = investorApplications.filter(investor => {
+    // Filter by status
+    if (activeTab !== 'all' && investor.status !== activeTab) return false;
+    
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      if (!investor.name.toLowerCase().includes(query) && 
+          !investor.investmentInterests.toLowerCase().includes(query)) {
+        return false;
+      }
+    }
+    
+    // Improved filter by net worth - handle different formats
+    if (netWorthFilter !== 'all') {
+      const netWorth = investor.netWorth.toLowerCase();
+      
+      // Extract numeric values when possible
+      const numMatch = netWorth.match(/[\d,.]+/);
+      const hasK = netWorth.includes('k');
+      const hasM = netWorth.includes('m');
+      
+      // Convert to approximate numeric value for comparison
+      let numericValue = 0;
+      if (numMatch) {
+        numericValue = parseFloat(numMatch[0].replace(/,/g, ''));
+        if (hasK) numericValue *= 1000;
+        if (hasM) numericValue *= 1000000;
+      }
+      
+      switch (netWorthFilter) {
+        case 'under100k':
+          if (!(netWorth.includes('under 100') || 
+                netWorth.includes('<100') || 
+                netWorth.includes('less than 100') ||
+                (numericValue > 0 && numericValue < 100000))) {
+            return false;
+          }
+          break;
+        case '100k-500k':
+          if (!(netWorth.includes('100k-500k') ||
+                netWorth.includes('100-500') ||
+                (numericValue >= 100000 && numericValue <= 500000))) {
+            return false;
+          }
+          break;
+        case '500k-1m':
+          if (!(netWorth.includes('500k-1m') ||
+                netWorth.includes('500-1') ||
+                (numericValue >= 500000 && numericValue <= 1000000))) {
+            return false;
+          }
+          break;
+        case 'over1m':
+          if (!(netWorth.includes('over 1m') ||
+                netWorth.includes('>1m') ||
+                netWorth.includes('more than 1m') ||
+                (hasM && numericValue > 1) ||
+                (numericValue > 1000000))) {
+            return false;
+          }
+          break;
+      }
+    }
+    
+    // Filter by investment interests
+    if (selectedInvestmentInterests.length > 0) {
+      const interests = investor.investmentInterests.toLowerCase();
+      if (!selectedInvestmentInterests.some(interest => interests.includes(interest.toLowerCase()))) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
+  
+  // Sort by date logic remains the same
+  const sortedInvestors = [...filteredInvestors].sort((a, b) => {
+    const dateA = new Date(a.appliedDate);
+    const dateB = new Date(b.appliedDate);
+    return sortOption === 'newest' ? dateB.getTime() - dateA.getTime() : dateA.getTime() - dateB.getTime();
+  });
+  
+  setFilteredInvestors(sortedInvestors);
+}, [
+  investorApplications,
+  activeTab,
+  searchQuery,
+  netWorthFilter,
+  selectedInvestmentInterests,
+  sortOption,
+  activeApplicationTab
+]);
 
   const validateIdeaPost = (idea: IdeaPost | null): boolean => {
     if (!idea) return false;
@@ -422,12 +629,314 @@ export const RecruiterDashboard = () => {
     );
   }
 
+  // Add these imports if they're not already present
+
+
+// Add this SideNavBar component inside your RecruiterDashboard component
+// Update the SideNavBar component to show different filters for investors
+const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuOpen, setIsSideMenuOpen, isFilterOpen, setIsFilterOpen }) => {
+  return (
+    <>
+      {/* Same style and outer div structure */}
+      <div className={`fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-white border border-gray-300 dark:bg-gray-900 dark:border-gray-700 shadow-lg z-50 transform transition-transform ${isSideMenuOpen ? 'translate-x-0' : '-translate-x-full'} sm:translate-x-0 overflow-hidden`}>
+        <div className="h-full overflow-y-auto modern-scrollbar">
+          <div className="p-6">
+            {/* Same header and tab buttons */}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-green-500 dark:to-blue-500">
+                Menu
+              </h2>
+              <button
+                onClick={() => setIsSideMenuOpen(false)}
+                className="text-gray-600 dark:text-gray-300 sm:hidden"
+              >
+                <BsList className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="mt-6 space-y-4">
+              <div className="flex flex-col space-y-2">
+                {([
+                  { id: 'developers', icon: <BsPerson className="h-4 w-4 mr-2" />, label: 'Developer Applications' },
+                  { id: 'investors', icon: <BsGrid className="h-4 w-4 mr-2" />, label: 'Investor Applications' }
+                ] as const).map((item) => (        
+                  <Button
+                    key={item.id}
+                    variant={activeApplicationTab === item.id ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setActiveApplicationTab(item.id)}
+                    className={`flex items-center justify-start px-3 py-2 capitalize transition-all duration-300 ${
+                      activeApplicationTab === item.id
+                        ? 'bg-primary hover:bg-primary/90 dark:bg-blue-600 shadow-md'
+                        : 'hover:bg-gray-100 text-gray-700 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200'
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      {item.icon}
+                      <span>{item.label}</span>
+                    </div>
+                    {activeApplicationTab === item.id && (
+                      <span className="ml-auto bg-white/20 px-1.5 py-0.5 rounded-full text-xs">
+                        {activeApplicationTab === 'developers' ? filteredDeveloperCandidates.length : filteredInvestorApplications.length}
+                      </span>
+                    )}
+                  </Button>
+                ))}
+              </div>
+              <div className="relative">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  className="flex items-center justify-start w-full px-3 py-2 border-gray-300 dark:border-blue-400 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 transition-all duration-300"
+                >
+                  <BsFilter className="h-4 w-4 mr-2" />
+                  <span>Filter</span>
+                </Button>
+                {isFilterOpen && (
+                  <div className="mt-2 w-full bg-white dark:bg-gray-800 border rounded-md shadow-lg py-2">
+                    <div className="px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-200">Sort By</div>
+                    <div className="px-4 py-2">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="sortOption"
+                          value="newest"
+                          checked={sortOption === 'newest'}
+                          onChange={() => setSortOption('newest')}
+                          className="form-radio"
+                        />
+                        <span className="ml-2 dark:text-gray-200">Newest</span>
+                      </label>
+                      <label className="flex items-center mt-2">
+                        <input
+                          type="radio"
+                          name="sortOption"
+                          value="oldest"
+                          checked={sortOption === 'oldest'}
+                          onChange={() => setSortOption('oldest')}
+                          className="form-radio"
+                        />
+                        <span className="ml-2 dark:text-gray-200">Oldest</span>
+                      </label>
+                    </div>
+                    
+                    {/* Conditional filters based on the active tab */}
+                    {activeApplicationTab === 'developers' ? (
+                      <>
+                        <div className="px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-200">Experience Range</div>
+                        <div className="px-4 py-2">
+                          <label className="flex items-center">
+                            <input
+                              type="radio"
+                              name="experienceFilter"
+                              value="all"
+                              checked={experienceFilter === 'all'}
+                              onChange={() => setExperienceFilter('all')}
+                              className="form-radio"
+                            />
+                            <span className="ml-2 dark:text-gray-200">All</span>
+                          </label>
+                          <label className="flex items-center mt-2">
+                            <input
+                              type="radio"
+                              name="experienceFilter"
+                              value="0-1"
+                              checked={experienceFilter === '0-1'}
+                              onChange={() => setExperienceFilter('0-1')}
+                              className="form-radio"
+                            />
+                            <span className="ml-2 dark:text-gray-200">0-1 years</span>
+                          </label>
+                          <label className="flex items-center mt-2">
+                            <input
+                              type="radio"
+                              name="experienceFilter"
+                              value="1-3"
+                              checked={experienceFilter === '1-3'}
+                              onChange={() => setExperienceFilter('1-3')}
+                              className="form-radio"
+                            />
+                            <span className="ml-2 dark:text-gray-200">1-3 years</span>
+                          </label>
+                          <label className="flex items-center mt-2">
+                            <input
+                              type="radio"
+                              name="experienceFilter"
+                              value="3-5"
+                              checked={experienceFilter === '3-5'}
+                              onChange={() => setExperienceFilter('3-5')}
+                              className="form-radio"
+                            />
+                            <span className="ml-2 dark:text-gray-200">3-5 years</span>
+                          </label>
+                          <label className="flex items-center mt-2">
+                            <input
+                              type="radio"
+                              name="experienceFilter"
+                              value="5+"
+                              checked={experienceFilter === '5+'}
+                              onChange={() => setExperienceFilter('5+')}
+                              className="form-radio"
+                            />
+                            <span className="ml-2 dark:text-gray-200">5+ years</span>
+                          </label>
+                        </div>
+                        
+                        <div className="px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-200">Skills</div>
+                        <div className="px-4 py-2 max-h-40 overflow-y-auto">
+                          {availableSkills.map((skill) => (
+                            <label key={skill} className="flex items-center mt-2">
+                              <input
+                                type="checkbox"
+                                checked={selectedSkills.includes(skill)}
+                                onChange={() => {
+                                  if (selectedSkills.includes(skill)) {
+                                    setSelectedSkills(selectedSkills.filter(s => s !== skill));
+                                  } else {
+                                    setSelectedSkills([...selectedSkills, skill]);
+                                  }
+                                }}
+                                className="form-checkbox"
+                              />
+                              <span className="ml-2 dark:text-gray-200">{skill}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-200">Net Worth</div>
+                        <div className="px-4 py-2">
+                          <label className="flex items-center">
+                            <input
+                              type="radio"
+                              name="netWorthFilter"
+                              value="all"
+                              checked={netWorthFilter === 'all'}
+                              onChange={() => setNetWorthFilter('all')}
+                              className="form-radio"
+                            />
+                            <span className="ml-2 dark:text-gray-200">All</span>
+                          </label>
+                          <label className="flex items-center mt-2">
+                            <input
+                              type="radio"
+                              name="netWorthFilter"
+                              value="under100k"
+                              checked={netWorthFilter === 'under100k'}
+                              onChange={() => setNetWorthFilter('under100k')}
+                              className="form-radio"
+                            />
+                            <span className="ml-2 dark:text-gray-200">Under $100K</span>
+                          </label>
+                          <label className="flex items-center mt-2">
+                            <input
+                              type="radio"
+                              name="netWorthFilter"
+                              value="100k-500k"
+                              checked={netWorthFilter === '100k-500k'}
+                              onChange={() => setNetWorthFilter('100k-500k')}
+                              className="form-radio"
+                            />
+                            <span className="ml-2 dark:text-gray-200">$100K - $500K</span>
+                          </label>
+                          <label className="flex items-center mt-2">
+                            <input
+                              type="radio"
+                              name="netWorthFilter"
+                              value="500k-1m"
+                              checked={netWorthFilter === '500k-1m'}
+                              onChange={() => setNetWorthFilter('500k-1m')}
+                              className="form-radio"
+                            />
+                            <span className="ml-2 dark:text-gray-200">$500K - $1M</span>
+                          </label>
+                          <label className="flex items-center mt-2">
+                            <input
+                              type="radio"
+                              name="netWorthFilter"
+                              value="over1m"
+                              checked={netWorthFilter === 'over1m'}
+                              onChange={() => setNetWorthFilter('over1m')}
+                              className="form-radio"
+                            />
+                            <span className="ml-2 dark:text-gray-200">Over $1M</span>
+                          </label>
+                        </div>
+                        
+                        <div className="px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-200">Investment Interests</div>
+                        <div className="px-4 py-2 max-h-40 overflow-y-auto">
+                          {availableInvestmentInterests.map((interest) => (
+                            <label key={interest} className="flex items-center mt-2">
+                              <input
+                                type="checkbox"
+                                checked={selectedInvestmentInterests.includes(interest)}
+                                onChange={() => {
+                                  if (selectedInvestmentInterests.includes(interest)) {
+                                    setSelectedInvestmentInterests(selectedInvestmentInterests.filter(i => i !== interest));
+                                  } else {
+                                    setSelectedInvestmentInterests([...selectedInvestmentInterests, interest]);
+                                  }
+                                }}
+                                className="form-checkbox"
+                              />
+                              <span className="ml-2 dark:text-gray-200">{interest}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+
   // const filteredDeveloperCandidates = developerCandidates.filter(candidate => candidate.status === activeTab);
   // const filteredInvestorApplications = investorApplications.filter(application => application.status === activeTab);
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* <Navbar /> */}
+      <Navbar 
+      theme={theme} 
+      setIsSideMenuOpen={setIsSideMenuOpen} 
+      searchQuery={searchQuery}
+      setSearchQuery={setSearchQuery}
+      profileElement={
+        <button
+          onClick={() => setIsProfileOpen(true)}
+          className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200 ml-2"
+        >
+          <img 
+            src={profile?.photoURL} 
+            alt="Profile" 
+            className="h-10 w-10 rounded-full border-2 border-gray-300 dark:border-blue-400" 
+          />
+        </button>
+      }
+    />
+    
+    <SideNavBar
+      activeApplicationTab={activeApplicationTab}
+      setActiveApplicationTab={setActiveApplicationTab}
+      isSideMenuOpen={isSideMenuOpen}
+      setIsSideMenuOpen={setIsSideMenuOpen}
+      isFilterOpen={isFilterOpen}
+      setIsFilterOpen={setIsFilterOpen}
+    />
+    
+    {isSideMenuOpen && (
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 z-40 sm:hidden"
+        onClick={() => setIsSideMenuOpen(false)}
+      ></div>
+    )}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -571,26 +1080,29 @@ export const RecruiterDashboard = () => {
                         Developer Applications
                     </h2>
                         <div className="flex gap-2">
-                        {(['pending', 'reviewing', 'accepted', 'rejected'] as const).map((status) => (
-                            <Button
-                            key={status}
-                            variant={activeTab === status ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setActiveTab(status)}
-                            className={`capitalize ${
-                                activeTab === status
-                                ? 'bg-primary hover:bg-primary/90'
-                                : 'hover:bg-gray-100'
-                            }`}
-                            >
-                            {status}
-                            {activeTab === status && (
-                                <span className="ml-2 bg-white/20 px-1.5 py-0.5 rounded-full text-xs">
-                                {filteredDeveloperCandidates.length}
-                                </span>
-                            )}
-                            </Button>
-                        ))}
+                        {(['all', 'pending',  'accepted', 'rejected'] as const).map((status) => (
+                        <Button
+                          key={status}
+                          variant={activeTab === status ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setActiveTab(status)}
+                          className={`capitalize ${
+                            activeTab === status
+                              ? 'bg-primary hover:bg-primary/90'
+                              : 'hover:bg-gray-100'
+                          }`}
+                        >
+                          {status}
+                          {activeTab === status && (
+                            <span className="ml-2 bg-white/20 px-1.5 py-0.5 rounded-full text-xs">
+                              {status === 'all' 
+                                ? (activeApplicationTab === 'developers' ? developerCandidates.length : investorApplications.length)
+                                : (activeApplicationTab === 'developers' ? filteredDeveloperCandidates.length : filteredInvestorApplications.length)
+                              }
+                            </span>
+                          )}
+                        </Button>
+                      ))}
                         </div>
                     </div>
                 </CardHeader>
@@ -676,26 +1188,29 @@ export const RecruiterDashboard = () => {
                         Investor Applications
                     </h2>
                         <div className="flex gap-2">
-                        {(['pending', 'reviewing', 'accepted', 'rejected'] as const).map((status) => (
-                            <Button
-                            key={status}
-                            variant={activeTab === status ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setActiveTab(status)}
-                            className={`capitalize ${
-                                activeTab === status
-                                ? 'bg-primary hover:bg-primary/90'
-                                : 'hover:bg-gray-100'
-                            }`}
-                            >
-                            {status}
-                            {activeTab === status && (
-                                <span className="ml-2 bg-white/20 px-1.5 py-0.5 rounded-full text-xs">
-                                {filteredInvestorApplications.length}
-                                </span>
-                            )}
-                            </Button>
-                        ))}
+                        {(['all', 'pending', 'accepted', 'rejected'] as const).map((status) => (
+                        <Button
+                          key={status}
+                          variant={activeTab === status ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setActiveTab(status)}
+                          className={`capitalize ${
+                            activeTab === status
+                              ? 'bg-primary hover:bg-primary/90'
+                              : 'hover:bg-gray-100'
+                          }`}
+                        >
+                          {status}
+                          {activeTab === status && (
+                            <span className="ml-2 bg-white/20 px-1.5 py-0.5 rounded-full text-xs">
+                              {status === 'all' 
+                                ? (activeApplicationTab === 'investors' ? investorApplications.length : developerCandidates.length)
+                                : (activeApplicationTab === 'investors' ? filteredInvestorApplications.length : filteredDeveloperCandidates.length)
+                              }
+                            </span>
+                          )}
+                        </Button>
+                      ))}
                         </div>
                     </div>
                 </CardHeader>
