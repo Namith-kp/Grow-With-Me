@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { BsBuilding, BsCurrencyDollar, BsPencil, BsBriefcase,  BsSearch,  BsFilter, BsList, BsGrid, BsPerson } from "react-icons/bs";
+import { BsBuilding, BsCurrencyDollar, BsPencil, BsBriefcase,  BsSearch,  BsFilter, BsList, BsGrid, BsPerson, BsLightbulb } from "react-icons/bs";
 import { HiOutlineDocumentText, HiOutlineUsers } from "react-icons/hi";
 import { FaWhatsapp } from "react-icons/fa";
 import { motion } from "framer-motion";
@@ -119,6 +119,7 @@ export const RecruiterDashboard = () => {
   const [netWorthFilter, setNetWorthFilter] = useState<'all' | 'under100k' | '100k-500k' | '500k-1m' | 'over1m'>('all');
   const [selectedInvestmentInterests, setSelectedInvestmentInterests] = useState<string[]>([]);
   const [isProfileVisible, setIsProfileVisible] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
 
   
@@ -650,6 +651,31 @@ useEffect(() => {
 const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuOpen, setIsSideMenuOpen, isFilterOpen, setIsFilterOpen }) => {
   return (
     <>
+      <style jsx>{`
+            .modern-scrollbar::-webkit-scrollbar {
+              width: 4px;
+            }
+            .modern-scrollbar::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            .modern-scrollbar::-webkit-scrollbar-thumb {
+              background-color: transparent;
+              border-radius: 20px;
+              transition: background-color 0.3s ease;
+            }
+            .modern-scrollbar:hover::-webkit-scrollbar-thumb {
+              background-color: rgba(156, 163, 175, 0.5);
+            }
+            .modern-scrollbar::-webkit-scrollbar-thumb:hover {
+              background-color: rgba(107, 114, 128, 0.7);
+            }
+            .dark .modern-scrollbar:hover::-webkit-scrollbar-thumb {
+              background-color: rgba(99, 102, 241, 0.5);
+            }
+            .dark .modern-scrollbar::-webkit-scrollbar-thumb:hover {
+              background-color: rgba(99, 102, 241, 0.7);
+            }
+          `}</style>
       {/* Same style and outer div structure */}
       <div className={`fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-white border border-gray-300 dark:bg-gray-900 dark:border-gray-700 shadow-lg z-50 transform transition-transform ${isSideMenuOpen ? 'translate-x-0' : '-translate-x-full'} sm:translate-x-0 overflow-hidden`}>
         <div className="h-full overflow-y-auto modern-scrollbar">
@@ -677,7 +703,7 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                     variant={activeApplicationTab === item.id ? "default" : "outline"}
                     size="sm"
                     onClick={() => setActiveApplicationTab(item.id)}
-                    className={`flex items-center justify-start px-3 py-2 capitalize transition-all duration-300 ${
+                    className={`flex items-center justify-center px-3 py-2 capitalize transition-all duration-300 ${
                       activeApplicationTab === item.id
                         ? 'bg-primary hover:bg-primary/90 dark:bg-blue-600 shadow-md'
                         : 'hover:bg-gray-100 text-gray-700 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200'
@@ -916,7 +942,7 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                 setIsPostingIdea(true);
               }}
             >
-              <BsBriefcase className="h-4 w-4" />
+              <BsLightbulb className="h-4 w-4" />
               Post New Idea
             </Button>
             </div>
@@ -1015,24 +1041,7 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
             
 
             {/* Applications Section */}
-          <div className="space-y-6">
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex gap-4">
-                <Button
-                  variant={activeApplicationTab === 'developers' ? "default" : "outline"}
-                  onClick={() => setActiveApplicationTab('developers')}
-                >
-                  Developer Applications
-                </Button>
-                <Button
-                  variant={activeApplicationTab === 'investors' ? "default" : "outline"}
-                  onClick={() => setActiveApplicationTab('investors')}
-                >
-                  Investor Applications
-                </Button>
-              </div>
-            </div>
-            
+          <div className="space-y-6">      
             {/* Developer Applications Section */}
             {/* <div className="lg:col-span-2 space-y-6"> */}
             {activeApplicationTab === 'developers' && (
@@ -1070,46 +1079,67 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                         </div>
                     </div>
                 </CardHeader>
-                <CardContent className="p-6">
+                <CardContent className="p-5">
                     {/* Developer applications content */}
                     <div className="space-y-4">
+                    
                     {filteredDeveloperCandidates.map((candidate) => (
                       <motion.div
                         key={candidate.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white p-3 rounded-lg shadow-xl border border-gray-100 hover:border-primary/50 transition-all duration-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-blue-500"
+                        className="bg-white p-3 sm:p-4 rounded-lg shadow-xl border border-gray-100 hover:border-primary/50 transition-all duration-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-blue-500"
                         layout
                       >
-                        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                          <div className="space-y-3">
-                            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{candidate.name}</h3>
-                            <p className="text-gray-600 mt-1 dark:text-gray-400">Experience: {candidate.experience}</p>
-                            <div className="flex flex-wrap gap-2">
-                              {candidate.skills.map((tech, index) => (
-                                <span
-                                  key={index}
-                                  className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-primary/70 dark:text-gray-200"
-                                >
-                                  {tech}
-                                </span>
-                              ))}
+                        <div className="flex flex-col gap-4">
+                          {/* Candidate info with photo */}
+                          <div className="flex items-center gap-3">
+                            <img 
+                              src={candidate.photoURL || "https://via.placeholder.com/40"} 
+                              alt={candidate.name}
+                              className="w-12 h-12 rounded-full object-cover border-2 border-primary/20" 
+                            />
+                            <div>
+                              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100">{candidate.name}</h3>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Experience: {candidate.experience} years</p>
                             </div>
                           </div>
-                          <div className="flex flex-col items-end gap-3 min-w-[200px]">
-                            <p className="text-gray-500 dark:text-gray-400">Applied on {candidate.appliedDate}</p>
-                            <div className="flex gap-2">
+                          
+                          {/* Skills section */}
+                          <div className="flex flex-wrap gap-2">
+                            {candidate.skills.slice(0, 4).map((tech, index) => (
+                              <span
+                                key={index}
+                                className="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-primary/70 dark:text-gray-200"
+                              >
+                                {tech}
+                              </span>
+                            ))}
+                            {candidate.skills.length > 4 && (
+                              <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium dark:bg-gray-700 dark:text-gray-300">
+                                +{candidate.skills.length - 4} more
+                              </span>
+                            )}
+                          </div>
+                          
+                          {/* Application date and actions */}
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Applied on {candidate.appliedDate}</p>
+                            <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-end">
                               <Button 
                                 variant="outline" 
-                                className="hover:bg-primary hover:text-white transition-colors"
+                                size="sm"
+                                className="bg-primary hover:bg-primary/90 text-xs px-3 py-2 h-auto text-gray-100 dark:bg-gradient-to-r dark:from-blue-500 dark:to-blue-700 dark:hover:bg-gradient-to-r dark:hover:from-blue-700 dark:hover:to-blue-500 dark:text-gray-200"
                                 onClick={() => handleViewCandidate(candidate)}
                               >
                                 View Profile
                               </Button>
                               {candidate.status === 'pending' && (
-                                <div className="flex space-x-2">
+                                <div className="flex gap-2">
                                   <Button
                                     variant="default"
+                                    size="sm"
+                                    className="text-xs px-3 py-1 h-auto"
                                     onClick={() => handleUpdateApplicationStatus(candidate.id, 'accepted')}
                                     disabled={isSubmitting}
                                   >
@@ -1117,6 +1147,8 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                                   </Button>
                                   <Button
                                     variant="destructive"
+                                    size="sm"
+                                    className="text-xs px-3 py-1 h-auto"
                                     onClick={() => handleUpdateApplicationStatus(candidate.id, 'rejected')}
                                     disabled={isSubmitting}
                                   >
@@ -1187,38 +1219,58 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                         key={application.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white p-3 rounded-lg shadow-xl border border-gray-100 hover:border-primary/50 transition-all duration-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-blue-500"
+                        className="bg-white p-3 sm:p-4 rounded-lg shadow-xl border border-gray-100 hover:border-primary/50 transition-all duration-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-blue-500"
                         layout
                       >
-                        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                          <div className="space-y-3">
-                            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{application.name}</h3>
-                            <p className="text-gray-600 mt-1 dark:text-gray-400">Net Worth: {application.netWorth}</p>
-                            <div className="flex flex-wrap gap-2">
-                              {application.investmentInterests.split(',').map((tech, index) => (
-                                <span
-                                  key={index}
-                                  className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-primary/70 dark:text-gray-200"
-                                >
-                                  {tech}
-                                </span>
-                              ))}
+                        <div className="flex flex-col gap-4">
+                          {/* Investor info with photo */}
+                          <div className="flex items-center gap-3">
+                            <img 
+                              src={application.photoURL || "https://via.placeholder.com/40"} 
+                              alt={application.name}
+                              className="w-12 h-12 rounded-full object-cover border-2 border-primary/20" 
+                            />
+                            <div>
+                              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100">{application.name}</h3>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Net Worth: {application.netWorth}</p>
                             </div>
                           </div>
-                          <div className="flex flex-col items-end gap-3 min-w-[200px]">
-                            <p className="text-gray-500 dark:text-gray-400">Applied on {application.appliedDate}</p>
-                            <div className="flex gap-2">
+                          
+                          {/* Investment interests */}
+                          <div className="flex flex-wrap gap-2">
+                            {application.investmentInterests.split(',').slice(0, 3).map((interest, index) => (
+                              <span
+                                key={index}
+                                className="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-primary/70 dark:text-gray-200"
+                              >
+                                {interest.trim()}
+                              </span>
+                            ))}
+                            {application.investmentInterests.split(',').length > 3 && (
+                              <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium dark:bg-gray-700 dark:text-gray-300">
+                                +{application.investmentInterests.split(',').length - 3} more
+                              </span>
+                            )}
+                          </div>
+                          
+                          {/* Application date and actions */}
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Applied on {application.appliedDate}</p>
+                            <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-end">
                               <Button 
                                 variant="outline" 
-                                className="hover:bg-primary hover:text-white transition-colors"
+                                size="sm"
+                                className="bg-primary hover:bg-primary/90 text-xs px-3 py-2 h-auto text-gray-100 dark:bg-gradient-to-r dark:from-blue-500 dark:to-blue-700 dark:hover:bg-gradient-to-r dark:hover:from-blue-700 dark:hover:to-blue-500 dark:text-gray-200"
                                 onClick={() => handleViewInvestorApplication(application)}
                               >
                                 View Profile
                               </Button>
                               {application.status === 'pending' && (
-                                <div className="flex space-x-2">
+                                <div className="flex gap-2">
                                   <Button
                                     variant="default"
+                                    size="sm"
+                                    className="text-xs px-3 py-1 h-auto"
                                     onClick={() => handleUpdateInvestorApplicationStatus(application.id, 'accepted')}
                                     disabled={isSubmitting}
                                   >
@@ -1226,6 +1278,8 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                                   </Button>
                                   <Button
                                     variant="outline"
+                                    size="sm"
+                                    className="text-xs px-3 py-1 h-auto"
                                     onClick={() => handleUpdateInvestorApplicationStatus(application.id, 'rejected')}
                                     disabled={isSubmitting}
                                   >
@@ -1254,6 +1308,34 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
             </div>
           </div>
         </div>
+
+          {/* Bottom bar for mobile devices */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700 sm:hidden">
+            <div className="flex justify-around items-center py-2">
+              <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="text-gray-600 dark:text-gray-300">
+                <BsSearch className="h-6 w-6" />
+              </button>
+              <button onClick={() => setIsProfileOpen(true)} className="text-gray-600 dark:text-gray-300">
+              <img src={profile.photoURL} alt="Profile" className="h-6 w-6 rounded-full" />
+              </button>
+            </div>
+          </div>
+
+          {/* Search bar for mobile devices */}
+          {isSearchOpen && (
+            <div className="fixed bottom-16 left-0 right-0 bg-white dark:bg-transparent  sm:hidden"> 
+              <div className="relative w-full p-2">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full p-2 pl-10 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+                <BsSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              </div>
+            </div>
+          )}  
       </motion.div>
 
       
@@ -1281,7 +1363,7 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                   onClick={closeProfile}
                   className="rounded-full"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 dark:text-white">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                   </svg>
@@ -1296,12 +1378,12 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                     className="h-24 w-24 rounded-full border-4 border-primary/30 dark:border-blue-400/30"
                   />
                   <div className="text-center">
-                    <h3 className="text-2xl font-bold">{profile?.name || profile?.companyName || "Your Profile"}</h3>
+                    <h3 className="text-2xl font-bold dark:text-white">{profile?.name || profile?.companyName || "Your Profile"}</h3>
                     <p className="text-gray-500 dark:text-gray-400">{profile?.email}</p>
                   </div>
                   <Button
                     variant="outline"
-                    className="mt-2 w-full"
+                    className="flex items-center mt-2 justify-center w-full px-3 py-2 border-gray-300 dark:border-blue-400 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 transition-all duration-300"
                     onClick={() => {
                       setEditedProfile(profile);
                       setIsEditing(true);
@@ -1313,7 +1395,7 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                 </div>
 
                 <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80 dark:bg-gray-700/30">
-                  <BsBuilding className="text-primary text-xl mt-1 dark:text-blue-400" />
+                  <BsBuilding className="text-primary text-xl mt-1 dark:text-blue-400 w-4 h-5" />
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-gray-100">Company Details</h3>
                     <p className="text-gray-600 mt-1 dark:text-gray-300">{profile?.companyName}</p>
@@ -1338,7 +1420,7 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                 </div>
 
                 <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80 dark:bg-gray-700/30">
-                  <HiOutlineDocumentText className="text-primary text-xl mt-1 dark:text-blue-400" />
+                  <HiOutlineDocumentText className="text-primary text-xl mt-1 dark:text-blue-400 w-12 h-5" />
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-gray-100">Role Requirements</h3>
                     <p className="text-gray-600 mt-1 dark:text-gray-300">{profile?.roleDescription}</p>
@@ -1383,29 +1465,11 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                 <div className={`bg-white dark:bg-indigo-500 w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${theme === 'dark' ? 'translate-x-6' : ''}`}></div>
               </div>
             </div>
-
-                <Button
-                  className="w-full mt-4"
-                  onClick={() => {
-                    setIdeaPost({
-                      ...profile,
-                      cofounderRole: '',
-                      ideaDescription: '',
-                      responsibilities: '',
-                      idealCandidate: ''
-                    });
-                    setIsPostingIdea(true);
-                    setIsProfileOpen(false);
-                  }}
-                >
-                  <BsBriefcase className="h-4 w-4 mr-2" />
-                  Post New Idea
-                </Button>
-              </div>
-            </div>
           </div>
-        </>
-      )}
+        </div>
+      </div>
+    </>
+  )}
 
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
         <DialogContent className="max-w-md">
