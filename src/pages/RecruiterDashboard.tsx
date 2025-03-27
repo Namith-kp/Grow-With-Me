@@ -1310,13 +1310,13 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
         </div>
 
           {/* Bottom bar for mobile devices */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700 sm:hidden">
+          <div className="fixed bottom-0 left-0 right-0 rounded-lg bg-white dark:bg-gray-900 border-t border-gray-300 dark:border-gray-700 sm:hidden">
             <div className="flex justify-around items-center py-2">
               <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="text-gray-600 dark:text-gray-300">
-                <BsSearch className="h-6 w-6" />
+                <BsSearch className="h-7 w-7" />
               </button>
               <button onClick={() => setIsProfileOpen(true)} className="text-gray-600 dark:text-gray-300">
-              <img src={profile.photoURL} alt="Profile" className="h-6 w-6 rounded-full" />
+              <img src={profile.photoURL} alt="Profile" className="h-8 w-8 rounded-full" />
               </button>
             </div>
           </div>
