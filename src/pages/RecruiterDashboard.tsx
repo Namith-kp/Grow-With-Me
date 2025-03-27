@@ -75,6 +75,7 @@ interface RecruiterProfile {
   techStack: string;
   experienceRequired: string;
   uid: string;
+  name: string;
   email: string;
   photoURL: string;
 }
@@ -117,6 +118,7 @@ export const RecruiterDashboard = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [netWorthFilter, setNetWorthFilter] = useState<'all' | 'under100k' | '100k-500k' | '500k-1m' | 'over1m'>('all');
   const [selectedInvestmentInterests, setSelectedInvestmentInterests] = useState<string[]>([]);
+  const [isProfileVisible, setIsProfileVisible] = useState(false);
 
 
   
@@ -153,7 +155,18 @@ export const RecruiterDashboard = () => {
     setTheme(isDarkMode ? 'dark' : 'light');
   }, []);
 
+  const openProfile = () => {
+    setIsProfileVisible(true);
+    
+    setTimeout(() => setIsProfileOpen(true), 100);
+  };
   
+  // Use this function to close the profile
+  const closeProfile = () => {
+    setIsProfileOpen(false);
+    // Wait for animation to complete before hiding
+    setTimeout(() => setIsProfileVisible(false), 300);
+  };
 
   const handleUpdateApplicationStatus = async (candidateId: string, newStatus: 'accepted' | 'rejected') => {
     try {
@@ -889,6 +902,23 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                   </div>
                 )}
               </div>
+              <Button 
+              variant="outline"
+              className="flex items-center justify-start w-full px-3 py-2 border-gray-300 dark:border-blue-400 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 transition-all duration-300"
+              onClick={() => {
+                setIdeaPost({
+                  ...profile,
+                  cofounderRole: '',
+                  ideaDescription: '',
+                  responsibilities: '',
+                  idealCandidate: ''
+                });
+                setIsPostingIdea(true);
+              }}
+            >
+              <BsBriefcase className="h-4 w-4" />
+              Post New Idea
+            </Button>
             </div>
           </div>
         </div>
@@ -910,7 +940,7 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
       setSearchQuery={setSearchQuery}
       profileElement={
         <button
-          onClick={() => setIsProfileOpen(true)}
+          onClick={openProfile}
           className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200 ml-2"
         >
           <img 
@@ -940,17 +970,17 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="min-h-screen bg-white dark:bg-gradient-to-b dark:from-[#0f0c29] dark:via-[#6b29e4] dark:to-[#24243e] text-black dark:text-white"
+        className="min-h-screen h-[calc(100vh-16rem)] overflow-y-auto modern-scrollbar bg-white transition-all duration-300 dark:bg-gray-900 text-black dark:text-white sm:ml-64"
       >
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Header Section */}
-          <div className="flex justify-between items-center mb-8 mt-10">
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-8 mt-10">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-red-300 dark:to-blue-500">
               Founder Dashboard
             </h1>
-            <div className="flex items-center gap-4 ">
-            <div className="relative ">
+            <div className=" hidden flex-col sm:flex-row items-center gap-4 mt-4 sm:mt-0 w-full sm:w-auto">
+            <div className="relative w-full sm:w-auto flex-grow">
               <input
                 type="text"
                 placeholder="Search..."
@@ -980,78 +1010,12 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
           </div>
         </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Profile Section */}
-            <Card className="lg:col-span-1 border-none shadow-xl bg-white">
-              <CardHeader className="border-b border-gray-100">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-                    Company Profile
-                  </h2>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="hover:bg-primary"
-                    onClick={() => {
-                      setEditedProfile(profile);
-                      setIsEditing(true);
-                    }}
-                  >
-                    <BsPencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-6">
-                  <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80">
-                    <BsBuilding className="text-primary text-xl mt-1" />
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Company Details</h3>
-                      <p className="text-gray-600 mt-1">{profile.companyName}</p>
-                      <a 
-                        href={profile.companyWebsite} 
-                        className="text-primary hover:underline mt-1 block"
-                      >
-                        {profile.companyWebsite}
-                      </a>
-                      <p className="text-gray-600 mt-1">Size: {profile.companySize} employees</p>
-                      <p className="text-gray-600">Stage: {profile.fundingStage}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80">
-                    <BsCurrencyDollar className="text-primary text-xl mt-1" />
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Compensation</h3>
-                      <p className="text-gray-600 mt-1">Equity: {profile.equityRange}%</p>
-                      <p className="text-gray-600">Salary: ${profile.salaryRange}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80">
-                    <HiOutlineDocumentText className="text-primary text-xl mt-1" />
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Role Requirements</h3>
-                      <p className="text-gray-600 mt-1">{profile.roleDescription}</p>
-                      <p className="text-gray-600 mt-2">Experience: {profile.experienceRequired} years</p>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {profile.techStack.split(',').map((tech, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium"
-                          >
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 gap-8">
+            
+            
 
             {/* Applications Section */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="space-y-6">
             <div className="flex justify-between items-center mb-4">
               <div className="flex gap-4">
                 <Button
@@ -1072,11 +1036,11 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
             {/* Developer Applications Section */}
             {/* <div className="lg:col-span-2 space-y-6"> */}
             {activeApplicationTab === 'developers' && (
-                <Card className="border-none shadow-xl bg-white">
-                <CardHeader className="border-b border-gray-100">
+                <Card className="lg:col-span-1 border-none shadow-xl bg-gray-100 duration-300 dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800 dark:border-b dark:border-blue-400 dark:shadow-blue-500/80">
+                <CardHeader className="border-b border-gray-100 dark:border-gray-700">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent flex items-center gap-2">
-                        <HiOutlineUsers className="text-primary" />
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent flex items-center gap-2 dark:from-green-500 dark:to-blue-500">
+                        <HiOutlineUsers className="text-primary dark:text-gray-300" />
                         Developer Applications
                     </h2>
                         <div className="flex gap-2">
@@ -1088,9 +1052,9 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                           onClick={() => setActiveTab(status)}
                           className={`capitalize ${
                             activeTab === status
-                              ? 'bg-primary hover:bg-primary/90'
-                              : 'hover:bg-gray-100'
-                          }`}
+                            ? 'bg-primary hover:bg-primary/90 dark:bg-blue-600'
+                            : 'hover:bg-gray-300 hover:text-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-200'
+                        }`}
                         >
                           {status}
                           {activeTab === status && (
@@ -1114,17 +1078,18 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                         key={candidate.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white p-6 rounded-lg shadow-xl border border-gray-100 hover:border-primary/50 transition-all"
+                        className="bg-white p-3 rounded-lg shadow-xl border border-gray-100 hover:border-primary/50 transition-all duration-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-blue-500"
+                        layout
                       >
                         <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                           <div className="space-y-3">
-                            <h3 className="text-xl font-semibold text-gray-900">{candidate.name}</h3>
-                            <p className="text-gray-600">Experience: {candidate.experience}</p>
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{candidate.name}</h3>
+                            <p className="text-gray-600 mt-1 dark:text-gray-400">Experience: {candidate.experience}</p>
                             <div className="flex flex-wrap gap-2">
                               {candidate.skills.map((tech, index) => (
                                 <span
                                   key={index}
-                                  className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium"
+                                  className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-primary/70 dark:text-gray-200"
                                 >
                                   {tech}
                                 </span>
@@ -1132,7 +1097,7 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                             </div>
                           </div>
                           <div className="flex flex-col items-end gap-3 min-w-[200px]">
-                            <p className="text-gray-500">Applied: {candidate.appliedDate}</p>
+                            <p className="text-gray-500 dark:text-gray-400">Applied on {candidate.appliedDate}</p>
                             <div className="flex gap-2">
                               <Button 
                                 variant="outline" 
@@ -1168,9 +1133,9 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="bg-white p-8 rounded-lg shadow-xl text-center border border-gray-100"
+                        className="bg-white p-8 rounded-lg shadow-xl text-center border border-gray-100 dark:bg-gray-800 dark:border-gray-700 "
                       >
-                        <p className="text-gray-500">No candidates found in {activeTab} status.</p>
+                        <p className="text-gray-500 dark:text-gray-400">No candidates found in {activeTab} status.</p>
                       </motion.div>
                     )}
                   </div>
@@ -1180,11 +1145,11 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
 
                 {/* Investor Applications Section */}
                 {activeApplicationTab === 'investors' && (
-                <Card className="border-none shadow-xl bg-white">
-                <CardHeader className="border-b border-gray-100">
+                <Card className="lg:col-span-1 border-none shadow-xl bg-gray-100 duration-300 dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800 dark:border-b dark:border-blue-400 dark:shadow-blue-500/80">
+                <CardHeader className="border-b border-gray-100 dark:border-gray-700">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent flex items-center gap-2">
-                        <HiOutlineUsers className="text-primary" />
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent flex items-center gap-2 dark:from-green-500 dark:to-blue-500">
+                        <HiOutlineUsers className="text-primary dark:text-gray-300" />
                         Investor Applications
                     </h2>
                         <div className="flex gap-2">
@@ -1196,8 +1161,8 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                           onClick={() => setActiveTab(status)}
                           className={`capitalize ${
                             activeTab === status
-                              ? 'bg-primary hover:bg-primary/90'
-                              : 'hover:bg-gray-100'
+                            ? 'bg-primary hover:bg-primary/90 dark:bg-blue-600'
+                            : 'hover:bg-gray-300 hover:text-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-200'
                           }`}
                         >
                           {status}
@@ -1222,17 +1187,18 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                         key={application.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white p-6 rounded-lg shadow-xl border border-gray-100 hover:border-primary/50 transition-all"
+                        className="bg-white p-3 rounded-lg shadow-xl border border-gray-100 hover:border-primary/50 transition-all duration-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-blue-500"
+                        layout
                       >
                         <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                           <div className="space-y-3">
-                            <h3 className="text-xl font-semibold text-gray-900">{application.name}</h3>
-                            <p className="text-gray-600">Net Worth: {application.netWorth}</p>
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{application.name}</h3>
+                            <p className="text-gray-600 mt-1 dark:text-gray-400">Net Worth: {application.netWorth}</p>
                             <div className="flex flex-wrap gap-2">
                               {application.investmentInterests.split(',').map((tech, index) => (
                                 <span
                                   key={index}
-                                  className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium"
+                                  className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-primary/70 dark:text-gray-200"
                                 >
                                   {tech}
                                 </span>
@@ -1240,11 +1206,11 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                             </div>
                           </div>
                           <div className="flex flex-col items-end gap-3 min-w-[200px]">
-                            <p className="text-gray-500">Applied: {application.appliedDate}</p>
+                            <p className="text-gray-500 dark:text-gray-400">Applied on {application.appliedDate}</p>
                             <div className="flex gap-2">
                               <Button 
                                 variant="outline" 
-                                // className="hover:bg-primary hover:text-white transition-colors"
+                                className="hover:bg-primary hover:text-white transition-colors"
                                 onClick={() => handleViewInvestorApplication(application)}
                               >
                                 View Profile
@@ -1276,9 +1242,9 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="bg-white p-8 rounded-lg shadow-xl text-center border border-gray-100"
+                        className="bg-white p-8 rounded-lg shadow-xl text-center border border-gray-100 dark:bg-gray-800 dark:border-gray-700 "
                       >
-                        <p className="text-gray-500">No candidates found in {activeTab} status.</p>
+                        <p className="text-gray-500 dark:text-gray-400">No candidates found in {activeTab} status.</p>
                       </motion.div>
                     )}
                   </div>
@@ -1289,6 +1255,158 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
           </div>
         </div>
       </motion.div>
+
+      
+
+      {/* Sliding Profile Panel */}
+      {isProfileVisible && (
+        <>
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={closeProfile}
+          ></div>
+          <div 
+            className={`fixed top-0 right-0 h-full w-[95%] max-w-md bg-white dark:bg-gray-800 shadow-xl z-50 overflow-y-auto transition-transform duration-300 ease-in-out transform ${
+              isProfileOpen ? 'translate-x-0' : 'translate-x-full'
+            }`}
+          >           
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-green-500 dark:to-blue-500">
+                  Company Profile
+                </h2>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={closeProfile}
+                  className="rounded-full"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </Button>
+              </div>
+
+              <div className="space-y-6">
+                <div className="flex flex-col items-center py-6 gap-4 mb-4">
+                  <img 
+                    src={profile?.photoURL} 
+                    alt="Profile" 
+                    className="h-24 w-24 rounded-full border-4 border-primary/30 dark:border-blue-400/30"
+                  />
+                  <div className="text-center">
+                    <h3 className="text-2xl font-bold">{profile?.name || profile?.companyName || "Your Profile"}</h3>
+                    <p className="text-gray-500 dark:text-gray-400">{profile?.email}</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="mt-2 w-full"
+                    onClick={() => {
+                      setEditedProfile(profile);
+                      setIsEditing(true);
+                    }}
+                  >
+                    <BsPencil className="h-4 w-4 mr-2" />
+                    Edit Profile
+                  </Button>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80 dark:bg-gray-700/30">
+                  <BsBuilding className="text-primary text-xl mt-1 dark:text-blue-400" />
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">Company Details</h3>
+                    <p className="text-gray-600 mt-1 dark:text-gray-300">{profile?.companyName}</p>
+                    <a 
+                      href={profile?.companyWebsite} 
+                      className="text-primary hover:underline mt-1 block dark:text-blue-400"
+                    >
+                      {profile?.companyWebsite}
+                    </a>
+                    <p className="text-gray-600 mt-1 dark:text-gray-300">Size: {profile?.companySize} employees</p>
+                    <p className="text-gray-600 dark:text-gray-300">Stage: {profile?.fundingStage}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80 dark:bg-gray-700/30">
+                  <BsCurrencyDollar className="text-primary text-xl mt-1 dark:text-blue-400" />
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">Compensation</h3>
+                    <p className="text-gray-600 mt-1 dark:text-gray-300">Equity: {profile?.equityRange}%</p>
+                    <p className="text-gray-600 dark:text-gray-300">Salary: ${profile?.salaryRange}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80 dark:bg-gray-700/30">
+                  <HiOutlineDocumentText className="text-primary text-xl mt-1 dark:text-blue-400" />
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">Role Requirements</h3>
+                    <p className="text-gray-600 mt-1 dark:text-gray-300">{profile?.roleDescription}</p>
+                    <p className="text-gray-600 mt-2 dark:text-gray-300">Experience: {profile?.experienceRequired} years</p>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {profile?.techStack.split(',').map((tech, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-blue-400/10 dark:text-blue-400"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* NEW: Appearance Section */}
+            <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50/80 dark:bg-gray-700">
+              <div className="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dark:text-white">
+                  <circle cx="12" cy="12" r="4"></circle>
+                  <path d="M12 2v2"></path>
+                  <path d="M12 20v2"></path>
+                  <path d="M4.93 4.93l1.41 1.41"></path>
+                  <path d="M17.66 17.66l1.41 1.41"></path>
+                  <path d="M2 12h2"></path>
+                  <path d="M20 12h2"></path>
+                  <path d="M6.34 17.66l-1.41 1.41"></path>
+                  <path d="M19.07 4.93l-1.41 1.41"></path>
+                </svg>
+                <span className="font-semibold text-gray-900 dark:text-gray-200">Appearance</span>
+              </div>
+              <div 
+                onClick={toggleTheme}
+                className="w-12 h-6 flex items-center bg-gray-300 dark:bg-gray-600 rounded-full px-1 cursor-pointer relative"
+              >
+                <div className="absolute left-1 right-0 flex justify-between items-center px-1 text-xs">
+                  <span className="text-yellow-500">☀️</span>
+                  <span className="text-indigo-300">🌙</span>
+                </div>
+                <div className={`bg-white dark:bg-indigo-500 w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${theme === 'dark' ? 'translate-x-6' : ''}`}></div>
+              </div>
+            </div>
+
+                <Button
+                  className="w-full mt-4"
+                  onClick={() => {
+                    setIdeaPost({
+                      ...profile,
+                      cofounderRole: '',
+                      ideaDescription: '',
+                      responsibilities: '',
+                      idealCandidate: ''
+                    });
+                    setIsPostingIdea(true);
+                    setIsProfileOpen(false);
+                  }}
+                >
+                  <BsBriefcase className="h-4 w-4 mr-2" />
+                  Post New Idea
+                </Button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
         <DialogContent className="max-w-md">
           <DialogHeader>

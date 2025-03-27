@@ -68,7 +68,7 @@ export const Navbar = ({ theme, setIsSideMenuOpen, searchQuery, setSearchQuery, 
               <div className="relative w-full max-w-md">
                 <input
                   type="text"
-                  placeholder="Search investments..."
+                  placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full p-2 pl-10 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-blue-400 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
