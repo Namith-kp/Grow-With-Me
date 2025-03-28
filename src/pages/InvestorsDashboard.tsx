@@ -912,36 +912,56 @@ const InvestorDashboard = () => {
 
       {/* Sliding Profile Window */}
       <div
-        className={`fixed top-0 right-0 w-80 h-full bg-white dark:bg-gray-800 shadow-lg transform transition-transform z-50 ${
+        className={`fixed top-0 right-0 w-80 h-full w-[95%] max-w-md bg-white dark:bg-gray-800 shadow-lg overflow-y-auto modern-scrollbar transform transition-transform duration-300 ease-in-out z-50 ${
           isProfileOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-green-500 dark:to-blue-500">Investor Profile</h2>
-            <Button
-                variant="outline"
-                size="icon"
-                className="border flex items-center space-x-1 dark:border-blue-400 dark:text-white"           
-                onClick={() => {
-                setEditedProfile(profile);
-                setIsEditing(true);
-                }}
-            >
-              <BsPencil className="h-4 w-4 " />
-            </Button>
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-green-500 dark:to-blue-500">
+              Investor Profile
+            </h2>
+              <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsProfileOpen(false)}
+                  className="rounded-full"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 dark:text-white">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </Button>            
           </div>
           <div className="space-y-6">
+            <div className="flex flex-col items-center py-6 gap-4 mb-4">
+                  <img 
+                    src={profile?.photoURL} 
+                    alt="Profile" 
+                    className="h-24 w-24 rounded-full border-4 border-primary/30 dark:border-blue-400/30"
+                  />
+                  <div className="text-center">
+                    <h3 className="text-2xl font-bold dark:text-white">{profile?.firstName} {profile?.lastName}</h3>
+                    <p className="text-gray-500 dark:text-gray-400">{profile?.email}</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="flex items-center mt-2 justify-center w-full px-3 py-2 border-gray-300 dark:border-blue-400 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 transition-all duration-300"
+                    onClick={() => {
+                      setEditedProfile(profile);
+                      setIsEditing(true);
+                    }}
+                  >
+                    <BsPencil className="h-4 w-4 mr-2" />
+                    Edit Profile
+                  </Button>
+                </div>            
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
-                {profile.firstName} {profile.lastName}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">{profile.email}</p>
-              <p className="text-gray-600 dark:text-gray-400">Net Worth: ${profile.netWorth}</p>
+              <p className="text-gray-900 ml-3 text-lg dark:text-gray-400">Net Worth: ${profile.netWorth}</p>
             </div>
 
             <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80 dark:bg-gray-700">
-              <HiOutlineDocumentText className="h-7 w-7 dark:text-white" />
+              <HiOutlineDocumentText className="h-5 w-5 dark:text-white" />
               <div>
                 <h3 className="font-semibold text-gray-900 dark:text-gray-200">Past Investments</h3>
                 <p className="text-gray-600 dark:text-gray-400 mt-1">{profile.pastInvestments}</p>
@@ -956,7 +976,7 @@ const InvestorDashboard = () => {
                   {profile.investmentInterests.split(',').map((skill, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-primary/70 dark:text-gray-200"
+                      className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-blue-400/10 dark:text-blue-400"
                     >
                       {skill.trim()}
                     </span>
@@ -1046,7 +1066,11 @@ const InvestorDashboard = () => {
           </div>
 
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsEditing(false)}>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsEditing(false)}
+              className="bg-primary hover:bg-primary/90 text-gray-200 dark:bg-primary dark:hover:bg-gray-700"
+              >
               Cancel
             </Button>
             <Button variant="outline" onClick={handleProfileUpdate}>
@@ -1093,7 +1117,11 @@ const InvestorDashboard = () => {
               />
             </div>
             <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setSelectedIdea(null)}>Cancel</Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setSelectedIdea(null)}
+                className="bg-primary hover:bg-primary/90 text-gray-200 dark:bg-primary dark:hover:bg-gray-700"
+                >Cancel</Button>
               <Button 
                 variant="outline"
                 onClick={() => handleSubmitApplication(selectedIdea.id)}

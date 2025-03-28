@@ -822,7 +822,7 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                         </div>
                         
                         <div className="px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-200">Skills</div>
-                        <div className="px-4 py-2 max-h-40 overflow-y-auto">
+                        <div className="px-4 py-2 max-h-40 overflow-y-auto modern-scrollbar">
                           {availableSkills.map((skill) => (
                             <label key={skill} className="flex items-center mt-2">
                               <input
@@ -1110,7 +1110,7 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                             {candidate.skills.slice(0, 4).map((tech, index) => (
                               <span
                                 key={index}
-                                className="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-primary/70 dark:text-gray-200"
+                                className="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-blue-400/10 dark:text-blue-400"
                               >
                                 {tech}
                               </span>
@@ -1241,7 +1241,7 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                             {application.investmentInterests.split(',').slice(0, 3).map((interest, index) => (
                               <span
                                 key={index}
-                                className="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-primary/70 dark:text-gray-200"
+                                className="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-blue-400/10 dark:text-blue-400"
                               >
                                 {interest.trim()}
                               </span>
@@ -1315,7 +1315,7 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
               <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="text-gray-600 dark:text-gray-300">
                 <BsSearch className="h-7 w-7" />
               </button>
-              <button onClick={() => setIsProfileOpen(true)} className="text-gray-600 dark:text-gray-300">
+              <button onClick={openProfile} className="text-gray-600 dark:text-gray-300">
               <img src={profile.photoURL} alt="Profile" className="h-8 w-8 rounded-full" />
               </button>
             </div>
@@ -1348,7 +1348,7 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
             onClick={closeProfile}
           ></div>
           <div 
-            className={`fixed top-0 right-0 h-full w-[95%] max-w-md bg-white dark:bg-gray-800 shadow-xl z-50 overflow-y-auto transition-transform duration-300 ease-in-out transform ${
+            className={`fixed top-0 right-0 h-full w-[95%] max-w-md bg-white dark:bg-gray-800 shadow-xl z-50 overflow-y-auto modern-scrollbar transition-transform duration-300 ease-in-out transform ${
               isProfileOpen ? 'translate-x-0' : 'translate-x-full'
             }`}
           >           
@@ -1472,11 +1472,11 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
   )}
 
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-3xl bg-white dark:bg-gray-800 ">
           <DialogHeader>
             <DialogTitle>Edit Company Profile</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-4 overflow-y-auto max-h-[70vh] modern-scrollbar p-1">
             <div>
               <label className="text-sm font-medium">Company Name</label>
               <Input
@@ -1552,10 +1552,18 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
             </div>
 
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsEditing(false)}>
+              <Button 
+                variant="outline" 
+                onClick={() => setIsEditing(false)}
+                className="bg-primary hover:bg-primary/90 text-gray-200 dark:bg-primary dark:hover:bg-gray-700"
+              >
                 Cancel
               </Button>
-              <Button onClick={handleProfileUpdate}>
+              <Button 
+                variant="outline"
+                onClick={handleProfileUpdate}
+                className="bg-primary hover:bg-primary/90 text-gray-200 dark:bg-gradient-to-r dark:from-blue-500 dark:to-blue-700 dark:hover:bg-gradient-to-r dark:hover:from-blue-700 dark:hover:to-blue-500"
+                >
                 Save Changes
               </Button>
             </div>
@@ -1757,7 +1765,7 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
         </DialogContent>
       </Dialog>
       <Dialog open={showCandidateDetails} onOpenChange={setShowCandidateDetails}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl dark:bg-gray-800">
           <DialogHeader>
             <DialogTitle>Candidate Details</DialogTitle>
           </DialogHeader>
@@ -1773,7 +1781,7 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                 )}
                 <div>
                   <h3 className="text-xl font-semibold">{selectedCandidate.name}</h3>
-                  <p className="text-gray-500">{selectedCandidate.email}</p>
+                  <p className="text-gray-500 dark:text-gray-400">{selectedCandidate.email}</p>
                   {selectedCandidate.whatsappNumber && (
                     <p className="text-gray-500 flex items-center space-x-2">
                       <FaWhatsapp className="text-green-500 text-lg" />
@@ -1781,7 +1789,7 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                         href={`https://wa.me/${selectedCandidate.whatsappNumber.replace(/\+/g, '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-500 hover:underline flex items-center"
+                        className="text-blue-500 hover:underline flex items-center dark:text-blue-400"
                       >
                         {selectedCandidate.whatsappNumber}
                       </a>
@@ -1793,12 +1801,12 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h4 className="font-semibold mb-2">Experience</h4>
-                  <p>{selectedCandidate.experience}</p>
+                  <p  className="dark:text-gray-300">{selectedCandidate.experience}</p>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">Education</h4>
-                  <p>{selectedCandidate.degree} at {selectedCandidate.university}</p>
-                  <p>Class of {selectedCandidate.graduationYear}</p>
+                  <p className="dark:text-gray-300">{selectedCandidate.degree} at {selectedCandidate.university}</p>
+                  <p className="dark:text-gray-300">Class of {selectedCandidate.graduationYear}</p>
                 </div>
               </div>
 
@@ -1808,7 +1816,7 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                   {selectedCandidate.skills.map((skill, index) => (
                     <span
                       key={index}
-                      className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                      className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm dark:bg-blue-400/10 dark:text-blue-400"
                     >
                       {skill}
                     </span>
@@ -1818,12 +1826,12 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
 
               <div>
                 <h4 className="font-semibold mb-2">Cover Letter</h4>
-                <p className="whitespace-pre-wrap">{selectedCandidate.coverLetter}</p>
+                <p className="whitespace-pre-wrap dark:text-gray-400">{selectedCandidate.coverLetter}</p>
               </div>
 
               <div>
                 <h4 className="font-semibold mb-2">Resume</h4>
-                <p className="whitespace-pre-wrap">{selectedCandidate.resume}</p>
+                <p className="whitespace-pre-wrap dark:text-gray-400">{selectedCandidate.resume}</p>
               </div>
 
               {selectedCandidate.github && (
@@ -1833,7 +1841,7 @@ const SideNavBar = ({ activeApplicationTab, setActiveApplicationTab, isSideMenuO
                     href={selectedCandidate.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
+                    className="text-blue-600 hover:underline dark:text-blue-400"
                   >
                     {selectedCandidate.github}
                   </a>
