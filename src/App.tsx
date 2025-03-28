@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { HashRouter as Router, Route, Navigate } from 'react-router-dom'
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { TooltipProvider } from "@/components/ui/tooltip"
@@ -39,7 +39,7 @@ function App() {
       <TooltipProvider>
         <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
           <Navbar theme={theme} />
-          <Routes>
+          <Router>
             <Route path="/" element={<Index />} />
             <Route path="/auth/developer" element={<AuthSignup userType="developer" />} />
             <Route path="/auth/recruiter" element={<AuthSignup userType="recruiter" />} />
@@ -53,7 +53,7 @@ function App() {
 
 
             <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          </Router>
           <Toaster />
         </div>
       </TooltipProvider>
