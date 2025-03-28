@@ -1,6 +1,6 @@
 {
-  "name": "vite_react_shadcn_ts",
-  "homepage": "https://Namith-kp.github.io/",
+  "name": "grow-with-me",
+  "homepage": "https://namith-kp.github.io/",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d build -b main"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
