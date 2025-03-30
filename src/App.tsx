@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { TooltipProvider } from "@/components/ui/tooltip"
@@ -35,7 +35,6 @@ function App() {
   // };
 
   return (
-    <HashRouter>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
@@ -59,7 +58,6 @@ function App() {
         </div>
       </TooltipProvider>
     </QueryClientProvider>
-    </HashRouter>
   )
 }
 
