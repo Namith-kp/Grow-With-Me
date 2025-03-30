@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, HashRouter as Router } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { TooltipProvider } from "@/components/ui/tooltip"
@@ -37,27 +37,27 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Router>
+        
         <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
           <Navbar theme={theme} />
           <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth/developer" element={<AuthSignup userType="developer" />} />
-            <Route path="/auth/recruiter" element={<AuthSignup userType="recruiter" />} />
-            <Route path="/auth/investor" element={<AuthSignup userType="investor" />} />
-            <Route path="/signup/developer" element={<DeveloperSignup />} />
-            <Route path="/signup/recruiter" element={<RecruiterSignup />} />
-            <Route path="/signup/investor" element={<InvestorsSignup />} />
-            <Route path="/recruiterdashboard" element={<RecruiterDashboard />} />
-            <Route path="/developerdashboard" element={<DeveloperDashboard />} />   
-            <Route path="/investorsdashboard" element={<InvestorsDashboard />} />         
+            <Route path="/Grow-With-Me/" element={<Index />} />
+            <Route path="/Grow-With-Me/auth/developer" element={<AuthSignup userType="developer" />} />
+            <Route path="/Grow-With-Me/auth/recruiter" element={<AuthSignup userType="recruiter" />} />
+            <Route path="/Grow-With-Me/auth/investor" element={<AuthSignup userType="investor" />} />
+            <Route path="/Grow-With-Me/signup/developer" element={<DeveloperSignup />} />
+            <Route path="/Grow-With-Me/signup/recruiter" element={<RecruiterSignup />} />
+            <Route path="/Grow-With-Me/signup/investor" element={<InvestorsSignup />} />
+            <Route path="/Grow-With-Me/recruiterdashboard" element={<RecruiterDashboard />} />
+            <Route path="/Grow-With-Me/developerdashboard" element={<DeveloperDashboard />} />   
+            <Route path="/Grow-With-Me/investorsdashboard" element={<InvestorsDashboard />} />         
 
 
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <Toaster />
         </div>
-        </Router>
+        
       </TooltipProvider>
     </QueryClientProvider>
   )
