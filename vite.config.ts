@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
-import path from "path";
-import { componentTagger } from "lovable-tagger";
+import path from "node:path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -9,7 +8,7 @@ export default defineConfig({
   base: "/Grow-With-Me/",
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(__dirname, "src"),
     },
   },
   build: {
@@ -17,8 +16,10 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-router-dom', 'react-dom'],
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            return "vendor"; // Automatically bundle dependencies
+          }
         },
       },
     },
