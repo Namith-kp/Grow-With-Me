@@ -37,7 +37,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Router>
+        
         <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
           <Navbar theme={theme} />
           <Routes>
@@ -57,7 +57,6 @@ function App() {
           </Routes>
           <Toaster />
         </div>
-        </Router>
       </TooltipProvider>
     </QueryClientProvider>
   )
