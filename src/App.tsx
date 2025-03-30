@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, HashRouter as Router } from 'react-router-dom'
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { TooltipProvider } from "@/components/ui/tooltip"
@@ -37,6 +37,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <Router>
         <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
           <Navbar theme={theme} />
           <Routes>
@@ -56,6 +57,7 @@ function App() {
           </Routes>
           <Toaster />
         </div>
+        </Router>
       </TooltipProvider>
     </QueryClientProvider>
   )
