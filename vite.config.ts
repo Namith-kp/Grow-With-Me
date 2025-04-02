@@ -5,7 +5,7 @@ import path from "node:path";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: "/Grow-With-Me/",
+  // base: "/Grow-With-Me/",
   
   resolve: {
     alias: {
