@@ -48,7 +48,7 @@ function App() {
             <Route path="/signup/developer" element={<DeveloperSignup />} />
             <Route path="/signup/recruiter" element={<RecruiterSignup />} />
             <Route path="/signup/investor" element={<InvestorsSignup />} />
-            <Route path="/recruiterdashboard" element={<RecruiterDashboard />} />
+            <Route path="/Grow-With-Me/recruiterdashboard" element={<RecruiterDashboard />} />
             <Route path="/developerdashboard" element={<DeveloperDashboard />} />   
             <Route path="/investorsdashboard" element={<InvestorsDashboard />} />         
 
