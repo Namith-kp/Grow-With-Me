@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { FaGithub } from "react-icons/fa";
 import { HiOutlineAcademicCap, HiOutlineBriefcase } from "react-icons/hi";
-import { BsPencil, BsBookmark, BsBookmarkFill } from "react-icons/bs";
+import { BsGrid, BsPerson, BsSearch, BsFilter, BsList, BsPencil, BsBookmark, BsBookmarkFill, BsCheckCircle } from "react-icons/bs";
 import { Navbar } from "@/components/Navbar";
 import { useLocation } from "react-router-dom";
 import { getFirestore, doc, getDoc, collection, query, getDocs, updateDoc } from 'firebase/firestore';
@@ -64,12 +64,29 @@ const DeveloperDashboard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedProfile, setEditedProfile] = useState<DeveloperProfile | null>(null);
   const [selectedIdea, setSelectedIdea] = useState<Idea | null>(null);
+  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [experienceFilter, setExperienceFilter] = useState<'all' | '0-1' | '1-3' | '3-5' | '5+'>('all');
+  const [selectedSkillFilters, setSelectedSkillFilters] = useState<string[]>([]);
+  const [sortOption, setSortOption] = useState<'newest' | 'oldest'>('newest');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  
+  
+
+
   const [applicationData, setApplicationData] = useState({ 
     coverLetter: "", 
     resume: "",
     whatsappNumber: "" 
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const availableSkills = [
+    'React', 'Angular', 'Vue', 'JavaScript', 'TypeScript', 'Python', 
+    'Java', 'C#', 'Node.js', 'Express', 'Django', 'Flask', 'Spring', 
+    'Firebase', 'AWS', 'Azure'
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -174,12 +191,6 @@ const DeveloperDashboard = () => {
   }
 
   
-  // return (
-  //   <div className="min-h-screen bg-background text-foreground p-4">
-  //     <h1 className="text-2xl font-bold">Dashboard</h1>
-  //       <ThemeSwitcher />
-  //   </div>
-  // );
   
   const toggleSaveIdea = (ideaId: string) => {
     setSavedIdeas(prev => 
@@ -189,11 +200,7 @@ const DeveloperDashboard = () => {
     );
   };
 
-  const filteredIdeas = ideas.filter(idea => {
-    if (activeTab === 'saved') return savedIdeas.includes(idea.id);
-    // Add applied ideas filter when you have that data
-    return true;
-  });
+  
 
   const handleProfileUpdate = async () => {
     if (!editedProfile || !location.state?.uid) return;
@@ -269,9 +276,295 @@ const DeveloperDashboard = () => {
     }
   };
 
+  const filteredIdeas = ideas.filter(idea => {
+    // Filter by tab
+    if (activeTab === 'saved') return savedIdeas.includes(idea.id);
+    if (activeTab === 'applied') {
+      // Add logic for applied ideas when implemented
+      return false; // For now, return false for 'applied' tab
+    }
+    
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return (
+        idea.companyName?.toLowerCase().includes(query) ||
+        idea.cofounderRole?.toLowerCase().includes(query) ||
+        idea.ideaDescription?.toLowerCase().includes(query) ||
+        idea.techStack?.toLowerCase().includes(query)
+      );
+    }
+    
+    return true; // Show all in 'all' tab when no search query
+  }).filter(idea => {
+    // Filter by experience requirement
+    if (experienceFilter !== 'all') {
+      const expRequired = parseInt(idea.experienceRequired);
+      if (experienceFilter === '0-1' && (expRequired >= 0 && expRequired <= 1)) return true;
+      if (experienceFilter === '1-3' && (expRequired > 1 && expRequired <= 3)) return true;
+      if (experienceFilter === '3-5' && (expRequired > 3 && expRequired <= 5)) return true;
+      if (experienceFilter === '5+' && expRequired > 5) return true;
+      return false;
+    }
+    return true;
+  }).filter(idea => {
+    // Filter by skills
+    if (selectedSkillFilters.length > 0) {
+      const techStack = idea.techStack.split(',').map(tech => tech.trim());
+      return selectedSkillFilters.some(skill => techStack.includes(skill));
+    }
+    return true;
+  }).sort((a, b) => {
+    // Sort by date
+    if (sortOption === 'newest') {
+      return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+    } else {
+      return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+    }
+  });
+
+
+  // Add this component inside your DeveloperDashboard component
+const SideNavBar = ({ activeTab, setActiveTab, setIsProfileOpen, isSideMenuOpen, setIsSideMenuOpen, isFilterOpen, setIsFilterOpen }) => {
   return (
     <>
-    {/* <Navbar/>     */}
+      <style jsx>{`
+        .modern-scrollbar::-webkit-scrollbar {
+          width: 4px;
+        }
+        .modern-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .modern-scrollbar::-webkit-scrollbar-thumb {
+          background-color: transparent;
+          border-radius: 20px;
+          transition: background-color 0.3s ease;
+        }
+        .modern-scrollbar:hover::-webkit-scrollbar-thumb {
+          background-color: rgba(156, 163, 175, 0.5);
+        }
+        .modern-scrollbar::-webkit-scrollbar-thumb:hover {
+          background-color: rgba(107, 114, 128, 0.7);
+        }
+        .dark .modern-scrollbar:hover::-webkit-scrollbar-thumb {
+          background-color: rgba(99, 102, 241, 0.5);
+        }
+        .dark .modern-scrollbar::-webkit-scrollbar-thumb:hover {
+          background-color: rgba(99, 102, 241, 0.7);
+        }
+      `}</style>
+      <div className={`fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-white border border-gray-300 dark:bg-gray-900 dark:border-gray-700 shadow-lg z-50 transform transition-transform ${isSideMenuOpen ? 'translate-x-0' : '-translate-x-full'} sm:translate-x-0 overflow-hidden`}>
+        <div className="h-full overflow-y-auto modern-scrollbar">
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-blue-500 dark:to-red-300">
+                Menu
+              </h2>
+              <button
+                onClick={() => setIsSideMenuOpen(false)}
+                className="text-gray-600 dark:text-gray-300 sm:hidden"
+              >
+                <BsList className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="mt-6 space-y-4">
+              <div className="flex flex-col space-y-2">
+                {([
+                  { id: 'all', icon: <BsGrid className="h-4 w-4 mr-2" />, label: 'All Opportunities' },
+                  { id: 'saved', icon: <BsBookmarkFill className="h-4 w-4 mr-2" />, label: 'Saved Jobs' },
+                  { id: 'applied', icon: <BsCheckCircle className="h-4 w-4 mr-2" />, label: 'Applied Jobs' }
+                ] as const).map((item) => (        
+                  <Button
+                    key={item.id}
+                    variant={activeTab === item.id ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setActiveTab(item.id)}
+                    className={`flex items-center justify-start px-3 py-2 capitalize transition-all duration-300 ${
+                      activeTab === item.id
+                        ? 'bg-primary hover:bg-primary/90 dark:bg-blue-600 shadow-md'
+                        : 'hover:bg-gray-100 text-gray-700 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200'
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      {item.icon}
+                      <span>{item.label}</span>
+                    </div>
+                    {activeTab === item.id && (
+                      <span className="ml-auto bg-white/20 px-1.5 py-0.5 rounded-full text-xs">
+                        {activeTab === 'all' ? filteredIdeas.length : 
+                         activeTab === 'saved' ? savedIdeas.length : 
+                         0 /* TODO: Replace with applied count */}
+                      </span>
+                    )}
+                  </Button>
+                ))}
+              </div>
+              <div className="relative">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  className="flex items-center justify-start w-full px-3 py-2 border-gray-300 dark:border-blue-400 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 transition-all duration-300"
+                >
+                  <BsFilter className="h-4 w-4 mr-2" />
+                  <span>Filter</span>
+                </Button>
+                {isFilterOpen && (
+                  <div className="mt-2 w-full bg-white dark:bg-gray-800 border rounded-md shadow-lg py-2">
+                    <div className="px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-200">Sort By</div>
+                    <div className="px-4 py-2">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="sortOption"
+                          value="newest"
+                          checked={sortOption === 'newest'}
+                          onChange={() => setSortOption('newest')}
+                          className="form-radio"
+                        />
+                        <span className="ml-2 dark:text-gray-200">Newest</span>
+                      </label>
+                      <label className="flex items-center mt-2">
+                        <input
+                          type="radio"
+                          name="sortOption"
+                          value="oldest"
+                          checked={sortOption === 'oldest'}
+                          onChange={() => setSortOption('oldest')}
+                          className="form-radio"
+                        />
+                        <span className="ml-2 dark:text-gray-200">Oldest</span>
+                      </label>
+                    </div>
+                    
+                    <div className="px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-200">Experience Range</div>
+                    <div className="px-4 py-2">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="experienceFilter"
+                          value="all"
+                          checked={experienceFilter === 'all'}
+                          onChange={() => setExperienceFilter('all')}
+                          className="form-radio"
+                        />
+                        <span className="ml-2 dark:text-gray-200">All</span>
+                      </label>
+                      <label className="flex items-center mt-2">
+                        <input
+                          type="radio"
+                          name="experienceFilter"
+                          value="0-1"
+                          checked={experienceFilter === '0-1'}
+                          onChange={() => setExperienceFilter('0-1')}
+                          className="form-radio"
+                        />
+                        <span className="ml-2 dark:text-gray-200">0-1 years</span>
+                      </label>
+                      <label className="flex items-center mt-2">
+                        <input
+                          type="radio"
+                          name="experienceFilter"
+                          value="1-3"
+                          checked={experienceFilter === '1-3'}
+                          onChange={() => setExperienceFilter('1-3')}
+                          className="form-radio"
+                        />
+                        <span className="ml-2 dark:text-gray-200">1-3 years</span>
+                      </label>
+                      <label className="flex items-center mt-2">
+                        <input
+                          type="radio"
+                          name="experienceFilter"
+                          value="3-5"
+                          checked={experienceFilter === '3-5'}
+                          onChange={() => setExperienceFilter('3-5')}
+                          className="form-radio"
+                        />
+                        <span className="ml-2 dark:text-gray-200">3-5 years</span>
+                      </label>
+                      <label className="flex items-center mt-2">
+                        <input
+                          type="radio"
+                          name="experienceFilter"
+                          value="5+"
+                          checked={experienceFilter === '5+'}
+                          onChange={() => setExperienceFilter('5+')}
+                          className="form-radio"
+                        />
+                        <span className="ml-2 dark:text-gray-200">5+ years</span>
+                      </label>
+                    </div>
+                    
+                    <div className="px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-200">Skills</div>
+                    <div className="px-4 py-2 max-h-40 overflow-y-auto">
+                      {availableSkills.map((skill) => (
+                        <label key={skill} className="flex items-center mt-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedSkillFilters.includes(skill)}
+                            onChange={() => {
+                              if (selectedSkillFilters.includes(skill)) {
+                                setSelectedSkillFilters(selectedSkillFilters.filter(s => s !== skill));
+                              } else {
+                                setSelectedSkillFilters([...selectedSkillFilters, skill]);
+                              }
+                            }}
+                            className="form-checkbox"
+                          />
+                          <span className="ml-2 dark:text-gray-200">{skill}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+  return (
+    <>
+    <Navbar 
+      theme={'dark'} 
+      setIsSideMenuOpen={setIsSideMenuOpen} 
+      searchQuery={searchQuery}
+      setSearchQuery={setSearchQuery}
+      profileElement={
+        <button
+          onClick={() => setIsProfileOpen(true)}
+          className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200 ml-2"
+        >
+          <img 
+            src={profile?.photoURL || "https://via.placeholder.com/40"} 
+            alt="Profile" 
+            className="h-10 w-10 rounded-full border-2 border-gray-300 dark:border-blue-400" 
+          />
+        </button>
+      }
+    />
+    
+    <SideNavBar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        setIsProfileOpen={setIsProfileOpen}
+        isSideMenuOpen={isSideMenuOpen}
+        setIsSideMenuOpen={setIsSideMenuOpen}
+        isFilterOpen={isFilterOpen}
+        setIsFilterOpen={setIsFilterOpen}
+      />
+    
+    {isSideMenuOpen && (
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 z-40 sm:hidden"
+        onClick={() => setIsSideMenuOpen(false)}
+      ></div>
+    )}
+
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -503,6 +796,33 @@ const DeveloperDashboard = () => {
           </div>
         </div>
       </div>
+          {/* Bottom bar for mobile devices */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700 sm:hidden">
+            <div className="flex justify-around items-center py-2">
+              <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="text-gray-600 dark:text-gray-300">
+                <BsSearch className="h-6 w-6" />
+              </button>
+              <button onClick={() => setIsProfileOpen(true)} className="text-gray-600 dark:text-gray-300">
+              <img src={profile.photoURL} alt="Profile" className="h-6 w-6 rounded-full" />
+              </button>
+            </div>
+          </div>
+
+          {/* Search bar for mobile devices */}
+          {isSearchOpen && (
+            <div className="fixed bottom-16 left-0 right-0 bg-white dark:bg-transparent  sm:hidden"> 
+              <div className="relative w-full p-2">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full p-2 pl-10 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+                <BsSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              </div>
+            </div>
+          )}
     </motion.div>
 
     {/* Edit Profile Dialog */}
