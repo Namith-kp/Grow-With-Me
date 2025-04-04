@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { getActiveJobs, submitApplication } from "@/lib/user";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-import { getInitialTheme, toggleTheme as toggleThemeUtil } from '@/components/theme';
+import { getInitialTheme, toggleTheme } from '@/components/theme';
 import ProfileTooltip from '@/components/ProfileTooltip'; // Adjust path as needed
 
 
@@ -75,7 +75,7 @@ const DeveloperDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme());
+  const [theme, setTheme] = useState(getInitialTheme());
   const [expandedCards, setExpandedCards] = useState<Record<string, { description: boolean, role: boolean }>>({});
   const navigate = useNavigate();
 
@@ -97,16 +97,12 @@ const DeveloperDashboard = () => {
     'Firebase', 'AWS', 'Azure'
   ];
 
-  const toggleTheme = () => {
-    const newTheme = toggleThemeUtil();
+  const handleToggleTheme = () => {
+    const newTheme = toggleTheme();
     setTheme(newTheme);
   };
   
-  // Add this effect to initialize theme
-  useEffect(() => {
-    const isDarkMode = document.documentElement.classList.contains('dark');
-    setTheme(isDarkMode ? 'dark' : 'light');
-  }, []);
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -992,7 +988,7 @@ const SideNavBar = ({ activeTab, setActiveTab, setIsProfileOpen, isSideMenuOpen,
           <span className="font-semibold text-gray-900 dark:text-gray-200">Appearance</span>
         </div>
         <div 
-          onClick={toggleTheme}
+          onClick={handleToggleTheme}
           className="w-12 h-6 flex items-center bg-gray-300 dark:bg-gray-600 rounded-full px-1 cursor-pointer relative"
         >
           <div className="absolute left-1 right-0 flex justify-between items-center px-1 text-xs">

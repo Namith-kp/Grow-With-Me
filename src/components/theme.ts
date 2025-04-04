@@ -1,67 +1,54 @@
-// Theme utility functions
+// Run theme initialization immediately 
+document.addEventListener('DOMContentLoaded', () => {
+  initializeTheme();
+});
 
-// Initialize theme on page load before React renders
-(() => {
+// Initialize theme based on localStorage or default
+function initializeTheme() {
   try {
-    // Get saved theme from localStorage
     const savedTheme = localStorage.getItem('theme');
+    console.log('Initializing theme, saved theme:', savedTheme);
     
-    if (savedTheme === 'light') {
-      // Only use light mode if explicitly set
+    if (savedTheme === 'dark') {
+      console.log('Applying dark theme');
+      document.documentElement.classList.add('dark');
+    } else if (savedTheme === 'light') {
+      console.log('Applying light theme');
       document.documentElement.classList.remove('dark');
     } else {
-      // In all other cases, default to dark mode
+      // Default to dark theme if nothing saved
+      console.log('No saved theme, defaulting to dark');
       document.documentElement.classList.add('dark');
-      // Also save it to localStorage so it persists
       localStorage.setItem('theme', 'dark');
     }
-    
-    // Log the current theme state to console for debugging
-    console.log('Theme initialized:', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
   } catch (e) {
-    // Make sure dark mode is set even if there's an error
-    document.documentElement.classList.add('dark');
-    console.error('Error initializing theme, defaulting to dark:', e);
+    console.error('Error initializing theme:', e);
   }
-})();
+}
 
-// Get the current theme from localStorage or system preference
+// Call it immediately as well
+initializeTheme();
+
+// Get the initial theme value
 export const getInitialTheme = (): 'light' | 'dark' => {
   if (typeof window === 'undefined') return 'dark';
-  
-  // Always check document class first
-  if (document.documentElement.classList.contains('dark')) {
-    return 'dark';
-  }
-  
-  // If no dark class found, check localStorage for explicit light preference
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme === 'light') {
-    return 'light';
-  }
-  
-  // Default to dark mode in all other cases
-  return 'dark';
+  return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
 };
 
-// Apply theme to document
+// Apply theme to document and localStorage
 export const applyTheme = (theme: 'light' | 'dark'): void => {
   if (theme === 'dark') {
     document.documentElement.classList.add('dark');
   } else {
     document.documentElement.classList.remove('dark');
   }
-  
-  // Save preference to localStorage
   localStorage.setItem('theme', theme);
-  console.log('Theme applied:', theme);
 };
 
-// Toggle between light and dark theme
+// Toggle theme function
 export const toggleTheme = (): 'light' | 'dark' => {
-  const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-  
+  const isDark = document.documentElement.classList.contains('dark');
+  const newTheme = isDark ? 'light' : 'dark';
   applyTheme(newTheme);
   return newTheme;
 };
