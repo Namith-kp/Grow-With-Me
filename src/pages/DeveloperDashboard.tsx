@@ -4,9 +4,9 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { FaGithub } from "react-icons/fa";
 import { HiOutlineAcademicCap, HiOutlineBriefcase } from "react-icons/hi";
-import { BsGrid, BsPerson, BsSearch, BsFilter, BsList, BsPencil, BsBookmark, BsBookmarkFill, BsCheckCircle } from "react-icons/bs";
+import { BsGrid, BsPerson, BsSearch, BsFilter, BsList, BsPencil, BsBookmark, BsBookmarkFill, BsCheckCircle, BsJournalText, BsAward } from "react-icons/bs";
 import { Navbar } from "@/components/Navbar";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getFirestore, doc, getDoc, collection, query, getDocs, updateDoc } from 'firebase/firestore';
 import { useToast } from "@/components/ui/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -14,6 +14,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { getActiveJobs, submitApplication } from "@/lib/user";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
+import { getInitialTheme, toggleTheme as toggleThemeUtil } from '@/components/theme';
+import ProfileTooltip from '@/components/ProfileTooltip'; // Adjust path as needed
+
 
 interface DeveloperProfile {                                                      
   firstName: string;
@@ -72,8 +75,14 @@ const DeveloperDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme());
+  const [expandedCards, setExpandedCards] = useState<Record<string, { description: boolean, role: boolean }>>({});
+  const navigate = useNavigate();
+
   
-  
+  const handleSignOut = () => {
+    navigate('/');
+  };
 
 
   const [applicationData, setApplicationData] = useState({ 
@@ -87,6 +96,17 @@ const DeveloperDashboard = () => {
     'Java', 'C#', 'Node.js', 'Express', 'Django', 'Flask', 'Spring', 
     'Firebase', 'AWS', 'Azure'
   ];
+
+  const toggleTheme = () => {
+    const newTheme = toggleThemeUtil();
+    setTheme(newTheme);
+  };
+  
+  // Add this effect to initialize theme
+  useEffect(() => {
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    setTheme(isDarkMode ? 'dark' : 'light');
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -125,6 +145,27 @@ const DeveloperDashboard = () => {
 
     fetchData();
   }, [location.state?.uid, toast]);
+
+
+  const toggleDescriptionExpansion = (ideaId: string) => {
+    setExpandedCards(prev => ({
+      ...prev,
+      [ideaId]: {
+        description: !(prev[ideaId]?.description ?? false),
+        role: prev[ideaId]?.role ?? false
+      }
+    }));
+  };
+  
+  const toggleRoleExpansion = (ideaId: string) => {
+    setExpandedCards(prev => ({
+      ...prev,
+      [ideaId]: {
+        description: prev[ideaId]?.description ?? false,
+        role: !(prev[ideaId]?.role ?? false)
+      }
+    }));
+  };
 
   // Fetch ideas
   useEffect(() => {
@@ -231,7 +272,7 @@ const DeveloperDashboard = () => {
     return techStack.split(',').map((tech, index) => (
       <span
         key={index}
-        className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium"
+        className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-blue-400/10 dark:text-blue-400"
       >
         {tech.trim()}
       </span>
@@ -279,11 +320,7 @@ const DeveloperDashboard = () => {
   const filteredIdeas = ideas.filter(idea => {
     // Filter by tab
     if (activeTab === 'saved') return savedIdeas.includes(idea.id);
-    if (activeTab === 'applied') {
-      // Add logic for applied ideas when implemented
-      return false; // For now, return false for 'applied' tab
-    }
-    
+   
     // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -391,9 +428,7 @@ const SideNavBar = ({ activeTab, setActiveTab, setIsProfileOpen, isSideMenuOpen,
                     </div>
                     {activeTab === item.id && (
                       <span className="ml-auto bg-white/20 px-1.5 py-0.5 rounded-full text-xs">
-                        {activeTab === 'all' ? filteredIdeas.length : 
-                         activeTab === 'saved' ? savedIdeas.length : 
-                         0 /* TODO: Replace with applied count */}
+                        {filteredIdeas.length}
                       </span>
                     )}
                   </Button>
@@ -497,7 +532,7 @@ const SideNavBar = ({ activeTab, setActiveTab, setIsProfileOpen, isSideMenuOpen,
                     </div>
                     
                     <div className="px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-200">Skills</div>
-                    <div className="px-4 py-2 max-h-40 overflow-y-auto">
+                    <div className="px-4 py-2 max-h-40 overflow-y-auto modern-scrollbar">
                       {availableSkills.map((skill) => (
                         <label key={skill} className="flex items-center mt-2">
                           <input
@@ -535,16 +570,13 @@ const SideNavBar = ({ activeTab, setActiveTab, setIsProfileOpen, isSideMenuOpen,
       searchQuery={searchQuery}
       setSearchQuery={setSearchQuery}
       profileElement={
-        <button
+      <div className="hidden sm:block">
+        <ProfileTooltip
+          photoURL={profile?.photoURL || "https://via.placeholder.com/40"}
           onClick={() => setIsProfileOpen(true)}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200 ml-2"
-        >
-          <img 
-            src={profile?.photoURL || "https://via.placeholder.com/40"} 
-            alt="Profile" 
-            className="h-10 w-10 rounded-full border-2 border-gray-300 dark:border-blue-400" 
-          />
-        </button>
+          tooltipText="Profile"
+        />
+      </div>
       }
     />
     
@@ -568,107 +600,25 @@ const SideNavBar = ({ activeTab, setActiveTab, setIsProfileOpen, isSideMenuOpen,
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen bg-white dark:bg-gradient-to-b dark:from-[#0f0c29] dark:via-[#6b29e4] dark:to-[#24243e] text-black dark:text-white"
-    >
+      className={`min-h-screen h-[calc(100vh-16rem)] overflow-y-auto modern-scrollbar bg-white transition-all duration-300 dark:bg-gray-900 text-black dark:text-white sm:ml-64`}
+      >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header Section */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 mt-10">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-red-300 dark:to-blue-500">
             Developer Dashboard
           </h1>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Profile Section */}
-          <Card className="lg:col-span-1 border-none shadow-xl bg-white">
-            <CardHeader className="border-b border-gray-100">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-                  Developer Profile
-                </h2>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="hover:bg-primary"
-                  onClick={() => {
-                    setEditedProfile(profile);
-                    setIsEditing(true);
-                  }}
-                >
-                  <BsPencil className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="space-y-6">
-                {/* Personal Info */}
-                <div className="space-y-2">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {profile.firstName} {profile.lastName}
-                  </h3>
-                  <p className="text-gray-600">{profile.email}</p>
-                  <p className="text-gray-600">Experience: {profile.experience}</p>
-                </div>
-
-                {/* Skills */}
-                <div className="space-y-2">
-                  <h3 className="font-semibold text-gray-900">Skills</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {profile.skills.split(',').map((skill, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium"
-                      >
-                        {skill.trim()}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Education */}
-                <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80">
-                  <HiOutlineAcademicCap className="text-primary text-xl mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Education</h3>
-                    <p className="text-gray-600 mt-1">{profile.university}</p>
-                    <p className="text-gray-600">{profile.degree}</p>
-                    <p className="text-gray-600">Class of {profile.graduationYear}</p>
-                  </div>
-                </div>
-
-                {/* GitHub */}
-                <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80">
-                  <FaGithub className="text-primary text-xl mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-gray-900">GitHub Profile</h3>
-                    <a 
-                      href={profile.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline mt-1 block"
-                    >
-                      {profile.github}
-                    </a>
-                  </div>
-                </div>
-
-                {/* Bio */}
-                <div className="space-y-2">
-                  <h3 className="font-semibold text-gray-900">About</h3>
-                  <p className="text-gray-600">{profile.bio}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Ideas Section */}
-          <div className="lg:col-span-2 space-y-6">
+         {/* Ideas Section */}
+          <div className="lg:col-span-3 space-y-6">
             {/* Tabs */}
-            <Card className="border-none shadow-xl bg-white">
-              <CardHeader className="border-b border-gray-100">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                  <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent flex items-center gap-2">
-                    <HiOutlineBriefcase className="text-primary" />
+          <Card className="lg:col-span-1 border-none shadow-xl bg-gray-100 duration-300 dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800 dark:border-b dark:border-blue-400 dark:shadow-blue-500/80">
+            <CardHeader className="border-b border-gray-100 dark:border-gray-700">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent flex items-center gap-2 dark:from-green-500 dark:to-blue-500">
+                  <HiOutlineBriefcase className=" h-5 w-6 text-primary dark:text-gray-100" />
                     Startup Ideas
                   </h2>
                   <div className="flex gap-2">
@@ -680,8 +630,8 @@ const SideNavBar = ({ activeTab, setActiveTab, setIsProfileOpen, isSideMenuOpen,
                         onClick={() => setActiveTab(status)}
                         className={`capitalize ${
                           activeTab === status
-                            ? 'bg-primary hover:bg-primary/90'
-                            : 'hover:bg-gray-100'
+                          ? 'bg-primary hover:bg-primary/90 dark:bg-blue-600'
+                          : 'hover:bg-gray-300 hover:text-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-200'
                         }`}
                       >
                         {status}
@@ -702,29 +652,29 @@ const SideNavBar = ({ activeTab, setActiveTab, setIsProfileOpen, isSideMenuOpen,
                       key={idea.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-white p-6 rounded-lg shadow-xl border border-gray-100 hover:border-primary/50 transition-all"
+                      className="bg-white p-3 rounded-lg shadow-xl border border-gray-100 hover:border-primary/50 transition-all duration-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-blue-500"
                     >
                       <div className="flex flex-col space-y-4">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h3 className="text-xl font-semibold text-gray-900">{idea.cofounderRole}</h3>
-                            <p className="text-gray-600 mt-1">{idea.companyName}</p>
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{idea.cofounderRole}</h3>
+                            <p className="text-gray-600 mt-1 dark:text-gray-300">{idea.companyName}</p>
                           </div>
                           <Button
                             variant="ghost"
                             size="icon"
                             onClick={() => toggleSaveIdea(idea.id)}
-                            className="hover:bg-primary/10"
+                            className="duration-300 hover:bg-gray-300 rounded-full p-2"
                           >
                             {savedIdeas.includes(idea.id) ? (
-                              <BsBookmarkFill className="h-5 w-5 text-primary" />
+                              <BsBookmarkFill className="h-5 w-5 text-primary dark:text-blue-400" />
                             ) : (
                               <BsBookmark className="h-5 w-5" />
                             )}
                           </Button>
                         </div>
 
-                        <div className="flex flex-wrap gap-3 text-sm text-gray-600">
+                        <div className="flex flex-wrap gap-3 text-sm text-gray-600 dark:text-gray-200">
                           <span>{idea.experienceRequired} years exp</span>
                           <span>•</span>
                           <span>{idea.fundingStage}</span>
@@ -747,16 +697,77 @@ const SideNavBar = ({ activeTab, setActiveTab, setIsProfileOpen, isSideMenuOpen,
                         </div>
 
                         <div>
-                          <h4 className="font-semibold text-gray-900 mb-2">Idea Description</h4>
-                          <p className="text-gray-600">{idea.ideaDescription}</p>
+                          <h4 className="font-semibold text-gray-900 mb-2 dark:text-gray-100">Idea Description</h4>
+                          <motion.div
+                              initial={false}
+                              animate={{ height: expandedCards[idea.id]?.description ? "auto" : "50px" }}
+                              className="relative overflow-hidden"
+                              transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                            >
+                              <div className="text-gray-600 dark:text-gray-400 whitespace-pre-line break-words">
+                                {idea.ideaDescription}
+                                
+                                {/* Gradient overlay when collapsed */}
+                                {!(expandedCards[idea.id]?.description) && idea.ideaDescription.length > 150 && (
+                                  <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white dark:from-gray-800 to-transparent pointer-events-none" />
+                                )}
+                              </div>
+                            </motion.div>
+                            
+                            {idea.ideaDescription.length > 150 && (
+                              <Button
+                                variant="link"
+                                className="text-primary dark:text-blue-400 p-0 h-auto mt-1 flex items-center gap-1 transition-transform duration-300"
+                                onClick={() => toggleDescriptionExpansion(idea.id)}
+                              >
+                                <span>{expandedCards[idea.id]?.description ? "See less" : "See more"}</span>
+                                <motion.span 
+                                  animate={{ rotate: expandedCards[idea.id]?.description ? 180 : 0 }}
+                                  transition={{ duration: 0.3 }}
+                                >
+                                  {expandedCards[idea.id]?.description ? "↑" : "↓"}
+                                </motion.span>
+                              </Button>
+                            )}
                         </div>
 
+                        {/* Role description with animation */}
                         {idea.roleDescription && (
-                          <div>
-                            <h4 className="font-semibold text-gray-900 mb-2">Role Description</h4>
-                            <p className="text-gray-600">{idea.roleDescription}</p>
-                          </div>
-                        )}
+                            <div className="my-2">
+                              <h4 className="font-semibold text-gray-900 mb-2 dark:text-gray-100">Role Description</h4>
+                              <motion.div
+                                initial={false}
+                                animate={{ height: expandedCards[idea.id]?.role ? "auto" : "50px" }}
+                                className="relative overflow-hidden"
+                                transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                              >
+                                <div className="text-gray-600 dark:text-gray-400 whitespace-pre-line break-words">
+                                  {idea.roleDescription}
+                                  
+                                  {/* Gradient overlay when collapsed */}
+                                  {!(expandedCards[idea.id]?.role) && idea.roleDescription.length > 150 && (
+                                    <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white dark:from-gray-800 to-transparent pointer-events-none" />
+                                  )}
+                                </div>
+                              </motion.div>
+                              
+                              {idea.roleDescription.length > 150 && (
+                                <Button
+                                  variant="link"
+                                  className="text-primary dark:text-blue-400 p-0 h-auto mt-1 flex items-center gap-1"
+                                  onClick={() => toggleRoleExpansion(idea.id)}
+                                >
+                                  <span>{expandedCards[idea.id]?.role ? "See more" : "See less"}</span>
+                                  <motion.span 
+                                    animate={{ rotate: expandedCards[idea.id]?.role ? 180 : 0 }}
+                                    transition={{ duration: 0.3 }}
+                                  >
+                                    {expandedCards[idea.id]?.role ? "↑" : "↓"}
+                                  </motion.span>
+                                </Button>
+                              )}
+                            </div>
+                          )}
 
                         <div className="flex justify-between items-center pt-4">
                           <div className="flex items-center space-x-2">
@@ -765,16 +776,17 @@ const SideNavBar = ({ activeTab, setActiveTab, setIsProfileOpen, isSideMenuOpen,
                               alt="Recruiter"
                               className="w-8 h-8 rounded-full"
                             />
-                            <span className="text-sm text-gray-500">
+                            <span className="text-sm text-gray-500 dark:text-gray-300">
                               Posted by {idea.email}
                             </span>
                           </div>
                           <div className="flex gap-2">
                             <Button 
-                              className="bg-primary hover:bg-primary/90"
-                              onClick={() => setSelectedIdea(idea)}
+                                className="bg-primary hover:bg-primary/90 dark:bg-gradient-to-r dark:from-blue-500 dark:to-blue-700 dark:hover:bg-gradient-to-r dark:hover:from-blue-700 dark:hover:to-blue-500"
+                                onClick={() => setSelectedIdea(idea)}
                             >
-                              Apply Now
+                              {activeTab === 'applied' ? 'Re-Apply Now' : 'Apply Now'}
+                            
                             </Button>
                           </div>
                         </div>
@@ -785,9 +797,9 @@ const SideNavBar = ({ activeTab, setActiveTab, setIsProfileOpen, isSideMenuOpen,
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="bg-white p-8 rounded-lg shadow-xl text-center border border-gray-100"
+                      className="bg-white p-8 rounded-lg shadow-xl text-center border border-gray-100 dark:bg-gray-800 dark:border-gray-700"
                     >
-                      <p className="text-gray-500">No ideas found in {activeTab} category.</p>
+                      <p className="text-gray-500 dark:text-gray-300">No ideas found in {activeTab} category.</p>
                     </motion.div>
                   )}
                 </div>
@@ -810,20 +822,205 @@ const SideNavBar = ({ activeTab, setActiveTab, setIsProfileOpen, isSideMenuOpen,
 
           {/* Search bar for mobile devices */}
           {isSearchOpen && (
-            <div className="fixed bottom-16 left-0 right-0 bg-white dark:bg-transparent  sm:hidden"> 
-              <div className="relative w-full p-2">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full p-2 pl-10 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-                <BsSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              </div>
-            </div>
+            <>
+              <div 
+                className="fixed inset-0 bg-black bg-opacity-50 z-50 sm:hidden"
+                onClick={() => setIsSearchOpen(false)}
+              ></div>
+              <motion.div
+                initial={{ y: -100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -100, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="fixed top-0 left-0 right-0 bg-transparent dark:bg-transparent shadow-lg z-50 sm:hidden"
+              > 
+                <div className="relative w-full p-4">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full p-3 pl-10 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    autoFocus
+                  />
+                  <BsSearch className="absolute left-7 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <button 
+                    className="absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setIsSearchOpen(false);
+                    }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+              </motion.div>
+            </>
           )}
     </motion.div>
+
+
+{/* Overlay */}
+{isProfileOpen && (
+  <div
+    className="fixed inset-0 bg-black bg-opacity-50 z-40"
+    onClick={() => setIsProfileOpen(false)}
+  ></div>
+)}
+
+{/* Sliding Profile Window */}
+<div
+  className={`fixed top-0 right-0 w-80 h-full w-[95%] max-w-md bg-white dark:bg-gray-800 shadow-lg overflow-y-auto modern-scrollbar transform transition-transform duration-300 ease-in-out z-50 ${
+    isProfileOpen ? 'translate-x-0' : 'translate-x-full'
+  }`}
+>
+  <div className="p-6">
+    <div className="flex justify-between items-center mb-4">
+      <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent dark:from-blue-500 dark:to-red-300">
+        Developer Profile
+      </h2>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setIsProfileOpen(false)}
+        className="rounded-full"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 dark:text-white">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </Button>            
+    </div>
+    <div className="space-y-6">
+      <div className="flex flex-col items-center py-6 gap-4 mb-4">
+        <img 
+          src={profile?.photoURL || "https://via.placeholder.com/40"} 
+          alt="Profile" 
+          className="h-24 w-24 rounded-full border-4 border-primary/30 dark:border-blue-400/30"
+        />
+        <div className="text-center">
+          <h3 className="text-2xl font-bold dark:text-white">{profile?.firstName} {profile?.lastName}</h3>
+          <p className="text-gray-500 dark:text-gray-400">{profile?.email}</p>
+        </div>
+        <Button
+          variant="outline"
+          className="flex items-center mt-2 justify-center w-full px-3 py-2 border-gray-300 dark:border-blue-400 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 transition-all duration-300"
+          onClick={() => {
+            setEditedProfile(profile);
+            setIsEditing(true);
+            setIsProfileOpen(false); // Close the profile panel when opening the edit dialog
+          }}
+        >
+          <BsPencil className="h-4 w-4 mr-2" />
+          Edit Profile
+        </Button>
+      </div>            
+      
+
+      <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80 dark:bg-gray-700">
+      <BsJournalText className="h-6 w-4 dark:text-white" />
+      <div className="space-y-2">
+        <h3 className="font-semibold text-gray-900 dark:text-gray-200">Bio</h3>
+        <p className="text-gray-600 dark:text-gray-400">{profile.bio}</p>
+        <p className="text-gray-600 dark:text-blue-400">Experience: {profile.experience} Years</p>
+      </div>
+      </div>
+        
+      <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80 dark:bg-gray-700">
+        <HiOutlineAcademicCap className="h-6 w-5 dark:text-white" />
+        <div>
+          <h3 className="font-semibold text-gray-900 dark:text-gray-200">Education</h3>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">{profile.university}</p>
+          <p className="text-gray-600 dark:text-gray-400">{profile.degree}</p>
+          <p className="text-gray-600 dark:text-gray-400">Class of {profile.graduationYear}</p>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80 dark:bg-gray-700">
+        <FaGithub className="h-6 w-5 dark:text-white" />
+        <div>
+          <h3 className="font-semibold text-gray-900 dark:text-gray-200">GitHub Profile</h3>
+          <a 
+            href={profile.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline mt-1 block dark:text-blue-400"
+          >
+            {profile.github}
+          </a>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50/80 dark:bg-gray-700">
+        <div className="flex-shrink-0 text-primary dark:text-white">
+          <BsAward className="h-6 w-5" />
+        </div>
+        <div className="space-y-2">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-200">Skills</h3>
+          <div className="flex flex-wrap gap-2">
+            {profile.skills.split(',').map((skill, index) => (
+              <span
+                key={index}
+                className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-blue-400/10 dark:text-blue-400"
+              >
+                {skill.trim()}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      
+
+      {/* Theme Toggle Section */}
+      <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50/80 dark:bg-gray-700">
+        <div className="flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dark:text-white">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2"></path>
+            <path d="M12 20v2"></path>
+            <path d="M4.93 4.93l1.41 1.41"></path>
+            <path d="M17.66 17.66l1.41 1.41"></path>
+            <path d="M2 12h2"></path>
+            <path d="M20 12h2"></path>
+            <path d="M6.34 17.66l-1.41 1.41"></path>
+            <path d="M19.07 4.93l-1.41 1.41"></path>
+          </svg>
+          <span className="font-semibold text-gray-900 dark:text-gray-200">Appearance</span>
+        </div>
+        <div 
+          onClick={toggleTheme}
+          className="w-12 h-6 flex items-center bg-gray-300 dark:bg-gray-600 rounded-full px-1 cursor-pointer relative"
+        >
+          <div className="absolute left-1 right-0 flex justify-between items-center px-1 text-xs">
+            <span className="text-yellow-500">☀️</span>
+            <span className="text-indigo-300">🌙</span>
+          </div>
+          <div className={`bg-white dark:bg-indigo-500 w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${theme === 'dark' ? 'translate-x-6' : ''}`}></div>
+        </div>
+      </div>
+
+      {/* Logout Button */}
+      <div className="mt-6 flex justify-center">
+        <Button
+          variant="destructive"
+          className="w-full flex items-center justify-center gap-2 text-red-500 dark:bg-red-00 dark:hover:bg-red-00 dark:text-red-500"
+          onClick={handleSignOut}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span className="font-semibold text-lg text-red-500 dark:text-red-500">Logout</span>
+        </Button>
+      </div>
+    </div>
+  </div>
+</div>
 
     {/* Edit Profile Dialog */}
     <Dialog open={isEditing} onOpenChange={setIsEditing}>

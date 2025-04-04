@@ -55,7 +55,7 @@ export const Navbar = ({ theme, setIsSideMenuOpen, searchQuery, setSearchQuery, 
             </button>
             <Link 
               to="/" 
-              className="text-lg sm:text-2xl md:text-2xl lg:text-3xl font-extrabold text-primary dark:text-dark-foreground tracking-tight hover:opacity-80 transition-opacity truncate"
+              className="text-2xl sm:text-2xl md:text-2xl lg:text-3xl font-extrabold text-primary dark:text-dark-foreground tracking-tight hover:opacity-80 transition-opacity truncate"
               >
               <span className="xs:inline">Grow With Me</span>
               
@@ -71,7 +71,7 @@ export const Navbar = ({ theme, setIsSideMenuOpen, searchQuery, setSearchQuery, 
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full p-2 pl-10 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-blue-400 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                  className="w-full p-2 pl-10 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-blue-400 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                 />
                 <BsSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-200" />
               </div>
@@ -84,7 +84,7 @@ export const Navbar = ({ theme, setIsSideMenuOpen, searchQuery, setSearchQuery, 
               <>
                 <Button 
                   onClick={handleSignOut}
-                  className="text-white shadow-lg rounded-full bg-black hover:bg-gray-700 dark:bg-blue-600 dark:hover:bg-blue-500 transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 active:shadow-md"
+                  className="hidden sm:block text-white shadow-lg rounded-full bg-black hover:bg-gray-700 dark:bg-blue-600 dark:hover:bg-blue-500 transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 active:shadow-md"
                 >
                   Log Out
                 </Button>

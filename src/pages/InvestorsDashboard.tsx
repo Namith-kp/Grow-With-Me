@@ -5,7 +5,7 @@ import { BsCurrencyDollar } from "react-icons/bs";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { BsGrid, BsPencil, BsBookmark, BsCheckCircle, BsBookmarkFill, BsPerson, BsSearch, BsFilter, BsList } from "react-icons/bs";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { useToast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,7 +15,7 @@ import { getFirestore, doc, getDoc, collection, query, getDocs, updateDoc } from
 import { getInvestmentOpportunities, getPortfolioPerformance, submitInvestmentInterest, getActiveJobs } from "@/lib/investor";
 import './InvestorsDashboard.css';
 import { getInitialTheme, toggleTheme as toggleThemeUtil } from '@/components/theme';
-
+import ProfileTooltip from '@/components/ProfileTooltip';
 
 interface InvestorProfile {
   firstName: string;
@@ -86,6 +86,12 @@ const InvestorDashboard = () => {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme());
   const [expandedCards, setExpandedCards] = useState<Record<string, { description: boolean, role: boolean }>>({});
+  const navigate = useNavigate();
+
+  
+  const handleSignOut = () => {
+    navigate('/');
+  };
 
     const [applicationData, setApplicationData] = useState({
         coverLetter: "",
@@ -311,7 +317,7 @@ const InvestorDashboard = () => {
     return investmentInterests.split(',').map((tech, index) => (
       <span
         key={index}
-        className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-primary/70 dark:text-gray-200"
+        className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium dark:bg-blue-400/10 dark:text-blue-400"
       >
         {tech.trim()}
       </span>
@@ -548,17 +554,14 @@ const InvestorDashboard = () => {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         profileElement={
-          <button
-            onClick={() => setIsProfileOpen(true)}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200 ml-2"
-          >
-            <img 
-              src={profile?.photoURL} 
-              alt="Profile" 
-              className="h-10 w-10 rounded-full border-2 border-gray-300 dark:border-blue-400" 
+          <div className="hidden sm:block">
+            <ProfileTooltip
+              photoURL={profile?.photoURL || "https://via.placeholder.com/40"}
+              onClick={() => setIsProfileOpen(true)}
+              tooltipText="Profile"
             />
-          </button>
-        }
+          </div>
+          }
       />
       <SideNavBar
         activeTab={activeTab}
@@ -654,10 +657,10 @@ const InvestorDashboard = () => {
                               <p className="text-gray-600 mt-1 dark:text-gray-300">{idea.companyName}</p>
                             </div>
                             <Button
-                              variant="outline"
+                              variant="ghost"
                               size="icon"
                               onClick={() => toggleSaveIdea(idea.id)}
-                              className="duration-300 hover:bg-gray-300"
+                              className="duration-300 hover:bg-gray-300 rounded-full p-2"
                             >
                               {savedIdeas.includes(idea.id) ? (
                                 <BsBookmarkFill className="h-5 w-5 text-primary dark:text-blue-400" />
@@ -887,18 +890,43 @@ const InvestorDashboard = () => {
 
           {/* Search bar for mobile devices */}
           {isSearchOpen && (
-            <div className="fixed bottom-16 left-0 right-0 bg-white dark:bg-transparent  sm:hidden"> 
-              <div className="relative w-full p-2">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full p-2 pl-10 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-                <BsSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              </div>
-            </div>
+            <>
+              <div 
+                className="fixed inset-0 bg-black bg-opacity-50 z-50 sm:hidden"
+                onClick={() => setIsSearchOpen(false)}
+              ></div>
+              <motion.div
+                initial={{ y: -100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -100, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="fixed top-0 left-0 right-0 bg-transparent dark:bg-transparent shadow-lg z-50 sm:hidden"
+              > 
+                <div className="relative w-full p-4">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full p-3 pl-10 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    autoFocus
+                  />
+                  <BsSearch className="absolute left-7 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <button 
+                    className="absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setIsSearchOpen(false);
+                    }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+              </motion.div>
+            </>
           )}
       </motion.div>
 
@@ -1011,6 +1039,22 @@ const InvestorDashboard = () => {
                 </div>
                 <div className={`bg-white dark:bg-indigo-500 w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${theme === 'dark' ? 'translate-x-6' : ''}`}></div>
               </div>
+            </div>
+
+            {/* Logout Button */}
+            <div className="mt-6 flex justify-center">
+              <Button
+                variant="destructive"
+                className="w-full flex items-center justify-center gap-2 text-red-500 dark:bg-red-00 dark:hover:bg-red-00 dark:text-red-500"
+                onClick={handleSignOut}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span className="font-semibold text-lg text-red-500 dark:text-red-500">Logout</span>
+              </Button>
             </div>
 
           </div>
