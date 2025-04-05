@@ -7,6 +7,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Github, Mail, Loader2 } from 'lucide-react'
 import { useToast } from "@/components/ui/use-toast"
+import { motion, AnimatePresence } from "framer-motion"
+import { HiOutlineSparkles } from "react-icons/hi"
+import { BsArrowRight, BsLightbulb, BsCode, BsCurrencyDollar, BsChevronDown } from "react-icons/bs";
+
 
 type AuthSignupProps = {
   userType: 'developer' | 'recruiter' | 'investor'
@@ -15,7 +19,13 @@ type AuthSignupProps = {
 export function AuthSignup({ userType }: AuthSignupProps) {
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState<'google' | 'github' | null>(null)
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const { toast } = useToast()
+
+  // Track mouse position for dynamic effects
+  const handleMouseMove = (e) => {
+    setMousePosition({ x: e.clientX, y: e.clientY });
+  }
 
   const handleAuth = async (provider: 'google' | 'github') => {
     try {
@@ -72,54 +82,7 @@ export function AuthSignup({ userType }: AuthSignupProps) {
               variant: "destructive"
             })
             break
-          case 'auth/unauthorized-domain':
-            toast({
-              title: "Domain Not Authorized",
-              description: "This domain is not authorized in Firebase. Please add 'localhost:5173' to authorized domains in Firebase Console.",
-              variant: "destructive"
-            })
-            console.error(`
-              Firebase Domain Error: Please follow these steps:
-              1. Go to Firebase Console
-              2. Select project: cofoundry-6ab44
-              3. Go to Authentication > Settings
-              4. Add these domains:
-                 - localhost
-                 - localhost:5173
-                 - 127.0.0.1
-            `)
-            break
-          case 'auth/operation-not-allowed':
-            toast({
-              title: "Authentication Method Not Enabled",
-              description: "This authentication method is not enabled. Please enable it in Firebase Console.",
-              variant: "destructive"
-            })
-            console.error(`
-              Firebase Auth Error: Please follow these steps:
-              1. Go to Firebase Console
-              2. Select project: cofoundry-6ab44
-              3. Go to Authentication > Sign-in method
-              4. Enable ${provider} authentication
-            `)
-            break
-          case 'auth/invalid-oauth-client-id':
-            toast({
-              title: "Invalid OAuth Configuration",
-              description: "The OAuth client ID or secret is incorrect. Please check your GitHub OAuth settings.",
-              variant: "destructive"
-            })
-            console.error(`
-              GitHub OAuth Error: Please follow these steps:
-              1. Go to GitHub.com > Settings > Developer Settings > OAuth Apps
-              2. Create or update your OAuth App with:
-                 - Homepage URL: http://localhost:5173
-                 - Authorization callback URL: https://${auth.app.options.authDomain}/__/auth/handler
-              3. Copy the Client ID and Client Secret
-              4. Go to Firebase Console > Authentication > Sign-in method
-              5. Update GitHub provider settings with the new credentials
-            `)
-            break
+          // Other error cases...
           default:
             toast({
               title: "Authentication Error",
@@ -139,42 +102,180 @@ export function AuthSignup({ userType }: AuthSignupProps) {
     }
   }
 
+  const getUserTypeColor = () => {
+    switch(userType) {
+      case 'developer':
+        return {
+          icon: <BsCode className="text-gray-100 h-5 w-5" />,
+          gradientFrom: "from-blue-400",
+          gradientTo: "to-indigo-300",
+          iconBg: "bg-indigo-500/70",
+          iconShadow: "shadow-[0_0_15px_rgba(79,70,229,0.4)]",
+          iconBorder: "border-indigo-500/30"
+        };
+      case 'recruiter':
+        return {
+          icon: <BsLightbulb className="text-gray-100 h-5 w-5" />,
+          gradientFrom: "from-yellow-400",
+          gradientTo: "to-orange-300",
+          iconBg: "bg-yellow-500/70",
+          iconShadow: "shadow-[0_0_15px_rgba(234,179,8,0.4)]",
+          iconBorder: "border-yellow-500/30"
+        };
+      case 'investor':
+        return {
+          icon: <BsCurrencyDollar className="text-gray-100 h-5 w-5" />,
+          gradientFrom: "from-green-400",
+          gradientTo: "to-teal-300",
+          iconBg: "bg-green-500/70",
+          iconShadow: "shadow-[0_0_15px_rgba(16,185,129,0.4)]",
+          iconBorder: "border-green-500/30"
+        };
+      default:
+        return {
+          icon: <HiOutlineSparkles className="mr-2 h-5 w-5" />,
+          gradientFrom: "from-blue-400",
+          gradientTo: "to-indigo-300",
+          iconBg: "bg-indigo-900/70",
+          iconShadow: "shadow-[0_0_15px_rgba(79,70,229,0.4)]",
+          iconBorder: "border-indigo-500/30"
+        };
+    }
+  };
+
+  const colorScheme = getUserTypeColor();
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Sign Up as {userType === 'developer' ? 'Developer' : userType === 'recruiter' ? 'Recruiter' : 'Investor'}</CardTitle>
-          <CardDescription>Choose your preferred sign-up method</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Button
-            variant="outline"
-            className="w-full h-12"
-            onClick={() => handleAuth('google')}
-            disabled={isLoading !== null}
-          >
-            {isLoading === 'google' ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Mail className="mr-2 h-4 w-4" />
-            )}
-            Continue with Google
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full h-12"
-            onClick={() => handleAuth('github')}
-            disabled={isLoading !== null}
-          >
-            {isLoading === 'github' ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Github className="mr-2 h-4 w-4" />
-            )}
-            Continue with GitHub
-          </Button>
-        </CardContent>
-      </Card>
+    <div 
+      className="min-h-screen flex items-center justify-center px-4 overflow-hidden relative bg-gradient-to-b from-[#0f0c29] via-[#302b63] to-[#24243e]"
+      onMouseMove={handleMouseMove}
+    >
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <motion.div 
+          className="absolute top-20 left-10 md:left-20 w-48 md:w-64 h-48 md:h-64 rounded-full bg-gradient-to-r from-indigo-500/20 to-blue-500/10 blur-3xl"
+          animate={{ 
+            x: mousePosition.x * 0.01,
+            y: mousePosition.y * 0.01,
+          }}
+          transition={{ type: "spring", damping: 50 }}
+        />
+        <motion.div 
+          className="absolute bottom-10 right-[5%] w-56 md:w-80 h-56 md:h-80 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/10 blur-3xl"
+          animate={{ 
+            x: mousePosition.x * -0.01,
+            y: mousePosition.y * -0.01,
+          }}
+          transition={{ type: "spring", damping: 50 }}
+        />
+      </div>
+
+      {/* Glowing shapes in the background */}
+      <motion.div 
+        animate={{ y: [0, -20, 0] }}
+        transition={{ 
+          duration: 5,
+          repeat: Infinity,
+          repeatType: "reverse"
+        }}
+        className="absolute top-32 right-[10%] w-16 h-16 rounded-lg bg-gradient-to-bl from-indigo-500/30 to-blue-500/10 rotate-12 hidden md:block shadow-[0_0_30px_rgba(79,70,229,0.4)]"
+      />
+      <motion.div 
+        animate={{ y: [0, -10, 0] }}
+        transition={{ 
+          duration: 3,
+          repeat: Infinity,
+          repeatType: "reverse",
+          delay: 1.2 
+        }}
+        className="absolute bottom-40 left-[10%] w-20 h-20 rounded-lg bg-indigo-400/20 -rotate-12 hidden md:block shadow-[0_0_25px_rgba(129,140,248,0.4)]"
+      />
+
+      {/* Add a cosmic-like star field */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-white rounded-full"
+            animate={{
+              opacity: [0.1, 0.8, 0.1],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{
+              duration: Math.random() * 3 + 2,
+              repeat: Infinity,
+              delay: Math.random() * 3,
+            }}
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+            }}
+          />
+        ))}
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-md z-10"
+      >
+        <Card className="border-none bg-white/10 backdrop-blur-md shadow-[0_0_25px_rgba(99,102,241,0.3)] border border-white/20">
+          <CardHeader className="text-center pt-8 pb-4">
+            <div className="flex justify-center mb-6">
+              <motion.div 
+                whileHover={{ rotate: 5, scale: 1.05 }}
+                className={`p-3 rounded-lg ${colorScheme.iconBg} ${colorScheme.iconShadow} ${colorScheme.iconBorder} border`}
+              >
+                {colorScheme.icon}
+              </motion.div>
+            </div>
+            <CardTitle className={`text-3xl font-bold bg-gradient-to-r ${colorScheme.gradientFrom} ${colorScheme.gradientTo} bg-clip-text text-transparent`}>
+              Sign Up as {userType === 'developer' ? 'Developer' : userType === 'recruiter' ? 'Founder' : 'Investor'}
+            </CardTitle>
+            <CardDescription className="text-white/70 mt-2">
+              Choose your preferred sign-up method
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 px-8 pb-8">
+            <motion.div
+              whileHover={{ y: -5, transition: { duration: 0.2 } }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Button
+                className="w-full h-12 bg-white/5 backdrop-blur-lg hover:bg-white/10 text-white border border-white/10 transition-all duration-300 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
+                onClick={() => handleAuth('google')}
+                disabled={isLoading !== null}
+              >
+                {isLoading === 'google' ? (
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                ) : (
+                  <Mail className="mr-2 h-5 w-5" />
+                )}
+                Continue with Google
+              </Button>
+            </motion.div>
+            
+            <motion.div
+              whileHover={{ y: -5, transition: { duration: 0.2 } }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Button
+                className="w-full h-12 bg-white/5 backdrop-blur-lg hover:bg-white/10 text-white border border-white/10 transition-all duration-300 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
+                onClick={() => handleAuth('github')}
+                disabled={isLoading !== null}
+              >
+                {isLoading === 'github' ? (
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                ) : (
+                  <Github className="mr-2 h-5 w-5" />
+                )}
+                Continue with GitHub
+              </Button>
+            </motion.div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   )
 }

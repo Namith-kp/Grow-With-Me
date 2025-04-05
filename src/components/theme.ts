@@ -9,20 +9,19 @@ function initializeTheme() {
     const savedTheme = localStorage.getItem('theme');
     console.log('Initializing theme, saved theme:', savedTheme);
     
-    if (savedTheme === 'dark') {
-      console.log('Applying dark theme');
-      document.documentElement.classList.add('dark');
-    } else if (savedTheme === 'light') {
+    if (savedTheme === 'light') {
       console.log('Applying light theme');
       document.documentElement.classList.remove('dark');
     } else {
-      // Default to dark theme if nothing saved
-      console.log('No saved theme, defaulting to dark');
+      // Default to dark theme for all other cases
+      console.log('Applying dark theme');
       document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
+      if (!savedTheme) localStorage.setItem('theme', 'dark');
     }
   } catch (e) {
     console.error('Error initializing theme:', e);
+    // Even on error, try to set dark mode
+    document.documentElement.classList.add('dark');
   }
 }
 
