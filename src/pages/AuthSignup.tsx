@@ -220,7 +220,7 @@ export function AuthSignup({ userType }: AuthSignupProps) {
         transition={{ duration: 0.6 }}
         className="w-full max-w-md z-10"
       >
-        <Card className="border-none bg-white/10 backdrop-blur-md shadow-[0_0_25px_rgba(99,102,241,0.3)] border border-white/20">
+        <Card className="border-none bg-white/10 shadow-[0_0_25px_rgba(99,102,241,0.3)] border border-white/20">
           <CardHeader className="text-center pt-8 pb-4">
             <div className="flex justify-center mb-6">
               <motion.div 
@@ -243,7 +243,7 @@ export function AuthSignup({ userType }: AuthSignupProps) {
               whileTap={{ scale: 0.98 }}
             >
               <Button
-                className="w-full h-12 bg-white/5 backdrop-blur-lg hover:bg-white/10 text-white border border-white/10 transition-all duration-300 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
+                className="w-full h-12 bg-white/5  hover:bg-white/10 text-white border border-white/10 transition-all duration-300 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
                 onClick={() => handleAuth('google')}
                 disabled={isLoading !== null}
               >
@@ -261,7 +261,7 @@ export function AuthSignup({ userType }: AuthSignupProps) {
               whileTap={{ scale: 0.98 }}
             >
               <Button
-                className="w-full h-12 bg-white/5 backdrop-blur-lg hover:bg-white/10 text-white border border-white/10 transition-all duration-300 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
+                className="w-full h-12 bg-white/5  hover:bg-white/10 text-white border border-white/10 transition-all duration-300 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
                 onClick={() => handleAuth('github')}
                 disabled={isLoading !== null}
               >

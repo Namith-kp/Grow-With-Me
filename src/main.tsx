@@ -4,7 +4,6 @@ import { HashRouter } from 'react-router-dom'
 import App from './App'
 import './index.css'
 import '@/components/theme';
-import { NavbarProvider } from './components/NavbarProvider';
 
 const root = createRoot(document.getElementById('root')!)
 
@@ -20,9 +19,7 @@ if (localStorage.getItem('theme') !== 'light') {
 root.render(
   <React.StrictMode>
     <HashRouter>
-      <NavbarProvider>
       <App />
-      </NavbarProvider>
     </HashRouter>
   </React.StrictMode>
 )

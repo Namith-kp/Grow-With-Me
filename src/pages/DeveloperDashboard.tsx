@@ -13,7 +13,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { getActiveJobs, submitApplication } from "@/lib/user";
-import ThemeSwitcher from "@/components/ThemeSwitcher";
 import { getInitialTheme, toggleTheme } from '@/components/theme';
 import ProfileTooltip from '@/components/ProfileTooltip'; // Adjust path as needed
 
