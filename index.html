@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -22,11 +22,28 @@
         }
       }(window.location))
     </script>
-    <script src="/Grow-With-Me/theme-init.js"></script>
+    
+    <script>
+      // Force dark mode by default
+      (function() {
+        try {
+          var savedTheme = localStorage.getItem('theme');
+          if (savedTheme === 'light') {
+            document.documentElement.classList.remove('dark');
+          } else {
+            // For all other cases use dark
+            document.documentElement.classList.add('dark');
+            if (savedTheme !== 'dark') localStorage.setItem('theme', 'dark');
+          }
+        } catch (e) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
 
-    <script type="module" crossorigin src="/Grow-With-Me/assets/index-D11b-nIZ.js"></script>
-    <link rel="modulepreload" crossorigin href="/Grow-With-Me/assets/vendor-DEtayrot.js">
-    <link rel="stylesheet" crossorigin href="/Grow-With-Me/assets/index-I5YfQ7Se.css">
+    <script type="module" crossorigin src="/Grow-With-Me/assets/index-DXSOb_Lh.js"></script>
+    <link rel="modulepreload" crossorigin href="/Grow-With-Me/assets/vendor-BNVMk7Gf.js">
+    <link rel="stylesheet" crossorigin href="/Grow-With-Me/assets/index-C-e2AZVZ.css">
   </head>
 
   <body>
